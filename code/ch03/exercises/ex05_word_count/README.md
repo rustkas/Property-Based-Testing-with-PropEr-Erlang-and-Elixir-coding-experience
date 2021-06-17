@@ -21,3 +21,8 @@ Create new propety via PropEr
 Format
 -----
     $ rebar3 format
+
+
+PropEr test
+-----
+    $ rebar3 proper
