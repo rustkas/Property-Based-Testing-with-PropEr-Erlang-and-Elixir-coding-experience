@@ -7,7 +7,7 @@ Create new OTP lib
 -----
     $ rebar3 new lib ex05_word_count && cd ex05_word_count
 
-Add information to rebar.config
+Add information to rebar.config and source code
 -----
 
 Get dependencies
@@ -21,3 +21,8 @@ Create new propety via PropEr
 Format
 -----
     $ rebar3 format
+
+
+PropEr test
+-----
+    $ rebar3 proper
