@@ -1,12 +1,9 @@
-ex01_dupes
-=====
-
 An OTP library
 
 
 Create new OTP lib
 -----
-    $ rebar3 new lib ex03_collect2 && cd ex03_collect2
+    $ rebar3 new lib ex04_dupes && cd ex04_dupes
 
 Add information to rebar.config
 
