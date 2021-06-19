@@ -7,7 +7,6 @@ _*
 *.swp
 *.swo
 .erlang.cookie
-.rebar3
 ebin
 log
 erl_crash.dump
