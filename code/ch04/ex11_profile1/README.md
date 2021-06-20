@@ -3,7 +3,7 @@ An OTP library
 
 Create new OTP lib
 -----
-    $ rebar3 new lib ex10_resize && ex10_resize
+    $ rebar3 new lib ex11_profile1 && ex11_profile1
 
 Add information to rebar.config
 
@@ -31,3 +31,7 @@ Format
 PropEr test
 -----
     $ rebar3 proper
+	$ rebar3 proper -m prop_generators -p prop_profile1,prop_profile2
+	$ rebar3 proper -p prop_profile3
+	$ rebar3 proper -p prop_profile4
+	$ rebar3 proper -p prop_profile5
