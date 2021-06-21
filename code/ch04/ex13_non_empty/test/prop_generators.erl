@@ -15,7 +15,7 @@ prop_non_empty2()->
 
 prop_non_empty3()->
 ?FORALL(List, non_empty(list(oneof([non_neg_integer(),integer(),bitstring(64)]))), 
- 		lists:all(fun(Elem)-> is_integer(Elem) or is_bitstring(Elem) end, List)).
+ 		lists:all(fun(Elem)-> is_integer(Elem) orelse is_bitstring(Elem) end, List)).
 
 prop_non_empty_map()->
 ?FORALL(List, non_empty(list(map(non_neg_integer(),float()))), 
