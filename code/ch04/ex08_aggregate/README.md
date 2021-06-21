@@ -3,7 +3,7 @@ An OTP library
 
 Create new OTP lib
 -----
-    $ rebar3 new lib ex08_aggregate && ex08_aggregate
+    $ rebar3 new lib ex08_aggregate && cd ex08_aggregate
 
 Add information to rebar.config
 

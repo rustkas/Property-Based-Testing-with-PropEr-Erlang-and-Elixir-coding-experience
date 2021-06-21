@@ -3,7 +3,7 @@ An OTP library
 
 Create new OTP lib
 -----
-    $ rebar3 new lib ex10_resize && ex10_resize
+    $ rebar3 new lib ex10_resize && cd ex10_resize
 
 Add information to rebar.config
 

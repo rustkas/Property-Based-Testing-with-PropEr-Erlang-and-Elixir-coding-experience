@@ -3,7 +3,7 @@ An OTP library
 
 Create new OTP lib
 -----
-    $ rebar3 new lib ex12_queue && ex12_queue
+    $ rebar3 new lib ex12_queue && cd ex12_queue
 
 Add information to rebar.config
 

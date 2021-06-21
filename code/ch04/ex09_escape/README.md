@@ -3,7 +3,7 @@ An OTP library
 
 Create new OTP lib
 -----
-    $ rebar3 new lib ex09_escape && ex09_escape
+    $ rebar3 new lib ex09_escape && cd ex09_escape
 
 Add information to rebar.config
 

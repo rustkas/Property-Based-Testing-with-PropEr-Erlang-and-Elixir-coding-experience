@@ -3,7 +3,7 @@ An OTP library
 
 Create new OTP lib
 -----
-    $ rebar3 new lib ex07_elements && cd ex07_elements
+    $ rebar3 new lib ex07_elements && cd cd ex07_elements
 
 Add information to rebar.config
 

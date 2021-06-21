@@ -42,7 +42,7 @@ prop_non_tuple2()->
  		lists:all(fun(Elem)-> is_tuple(Elem) end, List)).						
 		
 %%%%%%%%%%%%%%%
-%%% Generators %%%
+%%% Helpers %%%
 %%%%%%%%%%%%%%%
 non_empty1(ListOrBinGenerator) ->
          ?SUCHTHAT(L, ListOrBinGenerator, L =/= [] andalso L =/= <<>>).
