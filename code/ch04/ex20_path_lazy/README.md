@@ -2,7 +2,7 @@ An OTP library
 
 Create new OTP lib
 -----
-    $ rebar3 new lib ex19_path && cd ex19_path
+    $ rebar3 new lib ex20_path_lazy && cd ex20_path_lazy
 
 Add information to rebar.config
 
@@ -29,5 +29,5 @@ Format
 
 PropEr test
 -----
+    $ rebar3 proper -n 5
     $ rebar3 proper
-    $ rebar3 proper -p prop_path -n 5
