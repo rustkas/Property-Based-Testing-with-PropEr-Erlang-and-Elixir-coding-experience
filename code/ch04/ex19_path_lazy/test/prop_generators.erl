@@ -25,26 +25,27 @@ move(down, {X,Y}) -> {X,Y-1}.
 %%% Generators %%%
 %%%%%%%%%%%%%%%%%%
 path() ->
-           %   Current, Acc,  VisitedMap     ToIgnore
-           path({0,0}, [], #{{0,0} => seen}, []).
+    ?SIZED(Size,
+           %   Max, Current, Acc,  VisitedMap     ToIgnore
+           path(Size, {0,0}, [], #{{0,0} => seen}, [])).
 
-path(_Current, Acc, _Seen, [_,_,_,_]) -> % all directions tried
+path(0, _Current, Acc, _Seen, _Ignore) -> % directions limit
+    Acc; % max depth reached
+path(_Max, _Current, Acc, _Seen, [_,_,_,_]) -> % all directions tried
     Acc; % we give up
-path(Current, Acc, Seen, Ignore) ->
-    frequency([
-	    {1, Acc}, % probabilistic stop
-	    {15, increase_path(Current, Acc, Seen, Ignore)}
-	]).
+path(Max, Current, Acc, Seen, Ignore) ->
+    increase_path(Max, Current, Acc, Seen, Ignore).
 
-increase_path(Current, Acc, Seen, Ignore) ->
+increase_path(Max, Current, Acc, Seen, Ignore) ->
     DirectionGen = oneof([left, right, up, down] -- Ignore),
     ?LET(Direction, DirectionGen,
       begin
         NewPos = move(Direction, Current),
         case Seen of
             #{NewPos := _} -> % exists
-                path(Current, Acc, Seen, [Direction|Ignore]); % retry
+                path(Max, Current, Acc, Seen, [Direction|Ignore]); % retry
             _ ->
-                path(NewPos, [Direction|Acc], Seen#{NewPos => seen}, [])
+                path(Max-1, NewPos, [Direction|Acc],
+                     Seen#{NewPos => seen}, [])
         end
       end).
