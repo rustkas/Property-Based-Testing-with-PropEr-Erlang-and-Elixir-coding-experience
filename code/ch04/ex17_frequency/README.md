@@ -2,7 +2,7 @@ An OTP library
 
 Create new OTP lib
 -----
-    $ rebar3 new lib ex16_characters && cd ex16_characters
+    $ rebar3 new lib ex17_frequency && cd ex17_frequency
 
 Add information to rebar.config
 
@@ -30,8 +30,6 @@ Format
 PropEr test
 -----
     $ rebar3 proper
-	$ rebar3 proper -p prop_latin1_string --constraint_tries 80
-	$ rebar3 proper -p prop_latin2_string2
-	$ rebar3 proper -p prop_unicode_string --constraint_tries 2000
-	$ rebar3 proper -p prop_unicode_string2
-	$ rebar3 proper -p prop_unicode_string3
+	$ rebar3 proper -p prop_string
+	$ rebar3 proper -p prop_text_like
+	$ rebar3 proper -p prop_text_like2
