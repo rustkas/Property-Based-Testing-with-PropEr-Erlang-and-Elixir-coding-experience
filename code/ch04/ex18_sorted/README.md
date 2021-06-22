@@ -30,4 +30,5 @@ Format
 PropEr test
 -----
     $ rebar3 proper
-	$ rebar3 proper -p prop_mostly_sorted -n 1
+	$ rebar3 proper -p prop_mostly_sorted -n 3
+	$ rebar3 proper -p prop_sorted_list
