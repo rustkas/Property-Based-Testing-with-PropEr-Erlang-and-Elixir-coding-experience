@@ -1,6 +1,7 @@
 -module(prop_solutions).
 
 -compile([{nowarn_unused_function, [{ file_open, 2}, {file_write, 2}]}]).
+-import(ex06_symbolic_call,[mktemp/0]).
 -include_lib("proper/include/proper.hrl").
 
 %%%%%%%%%%%%%%%%%%
@@ -22,35 +23,6 @@ prop_make_tmp_file() ->
 %%%%%%%%%%%%%%%
 %%% Helpers %%%
 %%%%%%%%%%%%%%%
-
-mktemp() ->
-    mktemp("tmp").
-
--spec mktemp(Prefix) -> Result
-   when Prefix   :: string(),
-        Result   :: TempFile  :: file:filename().
-		
-mktemp(Prefix) ->
-    Rand = integer_to_list(binary:decode_unsigned(crypto:strong_rand_bytes(8)), 36),
-	TempDir = filename:basedir(user_cache, Prefix),
-	os:cmd("mkdir " ++ "\"" ++ TempDir ++ "\""),
-			
-	TempFilePath = filename:join(TempDir, Rand),
-	TempFilePath.
-
-
-%%%%%%%%%%%%%%%%%%
-%%% Generators %%%
-%%%%%%%%%%%%%%%%%%
-make_tmp_file()->
-	TmpFile = mktemp(),
-	ok = file:write_file(TmpFile, <<>>),
-	%io:format("Before TmpFile = ~p~n",[TmpFile]),
-	file(TmpFile)
-	%io:format("After TmpFile = ~p~n",[TmpFile]),
-	%TmpFile,.
-	.
-
 file_open(Name, Opts) ->
     io:format("File Open. Name = ~p, Opts = ~p~n",[Name, Opts]),
     {ok, Fd} = file:open(Name, Opts),
@@ -77,4 +49,18 @@ lines(Size, Fd) ->
 
 bin() ->
  non_empty(string()).
+
+
+
+%%%%%%%%%%%%%%%%%%
+%%% Generators %%%
+%%%%%%%%%%%%%%%%%%
+make_tmp_file()->
+	TmpFile = mktemp(),
+	ok = file:write_file(TmpFile, <<>>),
+	%io:format("Before TmpFile = ~p~n",[TmpFile]),
+	file(TmpFile)
+	%io:format("After TmpFile = ~p~n",[TmpFile]),
+	%TmpFile,.
+	.
 
