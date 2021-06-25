@@ -153,7 +153,7 @@ file(Name) ->
 
 lines(Size, Fd) ->
     if Size =< 1 -> Fd
-     ; Size > 1 -> lines(Size-1, {call, file_write, [Fd,bin()]})
+     ; Size > 1 -> lines(Size-1, {'$call', ?MODULE, file_write, [Fd,bin()]})
     end.	
 	
 file1(Name) ->
