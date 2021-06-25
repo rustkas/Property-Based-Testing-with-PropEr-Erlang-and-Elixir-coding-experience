@@ -1,4 +1,5 @@
 -module(prop_solutions).
+-compile([{nowarn_unused_function, [{ file_open, 2}, {file_write, 2}]}]).
 -include_lib("proper/include/proper.hrl").
 
 %%%%%%%%%%%%%%%%%%
@@ -159,8 +160,8 @@ lines(Size, Fd) ->
 bin() ->
  non_empty(bin()).
 
-file1(Name) ->
-     io:format("Name = ~p~n",[Name])
+%file1(Name) ->
+%     io:format("Name = ~p~n",[Name])
      %?SIZED(Size,put(file_size, Size)),
 	 %?SIZED(Size,
 	   %begin
@@ -173,10 +174,10 @@ file1(Name) ->
      %),
 	 %io:format("Size = ~p~n",[get(file_size)]),
 	 %erase(file_size)
-	 .
+%	 .
 
-lines1(Size, Fd) ->
+%lines1(Size, Fd) ->
      %io:format("Size = ~p~n",[Size]),
-     if Size =< 1 -> Fd
-      ; Size > 1 -> lines(Size-1, {call, file_write, [Fd,bin()]})
-     end.
+%     if Size =< 1 -> Fd
+%      ; Size > 1 -> lines(Size-1, {call, file_write, [Fd,bin()]})
+%     end.
