@@ -148,7 +148,7 @@ file_write(Fd, Data) ->
 file(Name) ->
     ?SIZED(
        Size,
-       lines(Size, {call, file_open, [Name, [read,write,raw]]})
+       lines(Size, {'$call', ?MODULE, file_open, [Name, [read,write,raw]]})
     ).
 
 lines(Size, Fd) ->
