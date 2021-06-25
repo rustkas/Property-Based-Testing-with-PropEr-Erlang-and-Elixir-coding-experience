@@ -156,6 +156,9 @@ lines(Size, Fd) ->
      ; Size > 1 -> lines(Size-1, {'$call', ?MODULE, file_write, [Fd,bin()]})
     end.	
 	
+bin() ->
+ non_empty(bin()).
+
 file1(Name) ->
      io:format("Name = ~p~n",[Name])
      %?SIZED(Size,put(file_size, Size)),
@@ -177,9 +180,3 @@ lines1(Size, Fd) ->
      if Size =< 1 -> Fd
       ; Size > 1 -> lines(Size-1, {call, file_write, [Fd,bin()]})
      end.
-
-
-
-bin() ->
- non_empty(string()).
-
