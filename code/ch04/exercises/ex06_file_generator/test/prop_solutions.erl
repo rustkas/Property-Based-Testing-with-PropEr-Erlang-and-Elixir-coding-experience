@@ -2,6 +2,7 @@
 -compile([{nowarn_unused_function, [{ file_open, 2}, {file_write, 2}]}]).
 -include_lib("proper/include/proper.hrl").
 -import(ex06_file_generator,[mktemp/0]).
+-export[file_open/2,file_write/2].
 
 %%%%%%%%%%%%%%%%%%
 %%% Properties %%%

@@ -3,6 +3,7 @@
 -compile([{nowarn_unused_function, [{ file_open, 2}, {file_write, 2}]}]).
 -import(ex06_symbolic_call,[mktemp/0]).
 -include_lib("proper/include/proper.hrl").
+-export[file_open/2,file_write/2].
 
 %%%%%%%%%%%%%%%%%%
 %%% Properties %%%
