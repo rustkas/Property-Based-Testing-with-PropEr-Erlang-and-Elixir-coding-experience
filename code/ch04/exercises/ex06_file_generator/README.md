@@ -19,6 +19,7 @@ Get PropEr help
 
 Create new propety via PropEr
 -----
+    $ rebar3 new proper mktemp
     $ rebar3 new proper exercises
 	$ rebar3 new proper solutions
 
@@ -30,12 +31,12 @@ Format
 
 PropEr test
 -----
-    $ rebar3 proper -m prop_solutions -p prop_rand
-	$ rebar3 proper -m prop_solutions -p prop_basedir -n 1
-	$ rebar3 proper -m prop_solutions -p prop_tmp_file_name
-	$ rebar3 proper -m prop_solutions -p prop_tmp_ensure_dir -n 1
-	$ rebar3 proper -m prop_solutions -p prop_tmp_write_to_file -n 1
-	$ rebar3 proper -m prop_solutions -p prop_tmp_write_to_file2 -n 1
+    $ rebar3 proper -m prop_mktemp -p prop_rand
+	$ rebar3 proper -m prop_mktemp -p prop_basedir -n 1
+	$ rebar3 proper -m prop_mktemp -p prop_tmp_file_name
+	$ rebar3 proper -m prop_mktemp -p prop_tmp_ensure_dir -n 1
+	$ rebar3 proper -m prop_mktemp -p prop_tmp_write_to_file -n 1
+	$ rebar3 proper -m prop_mktemp -p prop_tmp_write_to_file2 -n 1
 	
 	$ rebar3 proper -m prop_solutions -p prop_make_tmp_file -n 1
 

@@ -1,6 +1,7 @@
 -module(prop_solutions).
 -compile([{nowarn_unused_function, [{ file_open, 2}, {file_write, 2}]}]).
 -include_lib("proper/include/proper.hrl").
+-import(ex06_file_generator,[mktemp/0]).
 
 %%%%%%%%%%%%%%%%%%
 %%% Properties %%%
@@ -17,123 +18,10 @@ prop_make_tmp_file() ->
 			true			
         end).
 
-prop_rand() ->
-    ?FORALL(_Tmp, boolean(),
-        begin
-            _Rand = integer_to_list(binary:decode_unsigned(crypto:strong_rand_bytes(8)), 36),
-			%io:format("~p~n",[_Rand]),
-			true
-        end).
-
-prop_basedir() ->
-    ?FORALL(_Tmp, boolean(),
-        begin
-			Prefix = "tmp",
-			_TempDir = filename:basedir(user_cache, Prefix),
-			%io:format("~p~n",[_TempDir]),
-			true
-        end).
-
-prop_tmp_file_name() ->
-    ?FORALL(_Tmp, boolean(),
-        begin
-            Rand = integer_to_list(binary:decode_unsigned(crypto:strong_rand_bytes(8)), 36),
-			Prefix = "tmp",
-			TempDir = filename:basedir(user_cache, Prefix),
-			_TempFileName = filename:join(TempDir, Rand),
-			%io:format("~p~n",[_TempFileName]),
-			true
-        end).
-		
-prop_tmp_ensure_dir() ->
-    ?FORALL(_Tmp, boolean(),
-        begin
-			Prefix = "tmp",
-			TempDir = filename:basedir(user_cache, Prefix),
-			MainTmpDir = filename:dirname(TempDir),
-			os:cmd("mkdir " ++ "\"" ++ TempDir ++ "\""),
-			
-			true = filelib:is_dir(TempDir),
-			ok = file:del_dir_r(TempDir),
-			ok = file:del_dir(MainTmpDir),
-			true
-        end).		
-
-prop_tmp_write_to_file() ->
-    ?FORALL(_Tmp, boolean(),
-        begin
-            Rand = integer_to_list(binary:decode_unsigned(crypto:strong_rand_bytes(8)), 36),
-			Prefix = "tmp",
-			TempDir = filename:basedir(user_cache, Prefix),
-			os:cmd("mkdir " ++ "\"" ++ TempDir ++ "\""),
-			
-			TempFilePath = filename:join(TempDir, Rand),
-			{ok, IoDevice} = file:open(TempFilePath,[write,read, raw,{read_ahead,64*1024}]),
-			ok = file:write_file(TempFilePath, <<>>),
-			
-			TempDir = filename:dirname(TempFilePath),
-			
-			ok = file:close(IoDevice),
-			ok = file:delete(TempFilePath),
-			ok = file:del_dir_r(TempDir),
-			MainTmpDir = filename:dirname(TempDir),
-			ok = file:del_dir(MainTmpDir),
-			true
-        end).		
-
-% simplify tmp file creation
-prop_tmp_write_to_file2() ->
-    ?FORALL(_Tmp, boolean(),
-        begin
-            Rand = integer_to_list(binary:decode_unsigned(crypto:strong_rand_bytes(8)), 36),
-			Prefix = "tmp",
-			TempDir = filename:basedir(user_cache, Prefix),
-			os:cmd("mkdir " ++ "\"" ++ TempDir ++ "\""),
-			
-			TempFilePath = filename:join(TempDir, Rand),
-			ok = file:write_file(TempFilePath, <<>>),
-			
-			ok = file:delete(TempFilePath),
-			ok = file:del_dir_r(TempDir),
-			MainTmpDir = filename:dirname(TempDir),
-			ok = file:del_dir(MainTmpDir),
-			true
-        end).		
-
 
 %%%%%%%%%%%%%%%
 %%% Helpers %%%
 %%%%%%%%%%%%%%%
-
-
-mktemp() ->
-    mktemp("tmp").
-
--spec mktemp(Prefix) -> Result
-   when Prefix   :: string(),
-        Result   :: TempFile  :: file:filename().
-		
-mktemp(Prefix) ->
-    Rand = integer_to_list(binary:decode_unsigned(crypto:strong_rand_bytes(8)), 36),
-	TempDir = filename:basedir(user_cache, Prefix),
-	os:cmd("mkdir " ++ "\"" ++ TempDir ++ "\""),
-			
-	TempFilePath = filename:join(TempDir, Rand),
-	TempFilePath.
-
-
-%%%%%%%%%%%%%%%%%%
-%%% Generators %%%
-%%%%%%%%%%%%%%%%%%
-make_tmp_file()->
-	TmpFile = mktemp(),
-	ok = file:write_file(TmpFile, <<>>),
-	%io:format("Before TmpFile = ~p~n",[TmpFile]),
-	file(TmpFile)
-	%io:format("After TmpFile = ~p~n",[TmpFile]),
-	%TmpFile,.
-	.
-
 file_open(Name, Opts) ->
     io:format("File Open. Name = ~p, Opts = ~p~n",[Name, Opts]),
     {ok, Fd} = file:open(Name, Opts),
@@ -159,6 +47,21 @@ lines(Size, Fd) ->
 	
 bin() ->
  non_empty(bin()).
+ 
+
+%%%%%%%%%%%%%%%%%%
+%%% Generators %%%
+%%%%%%%%%%%%%%%%%%
+make_tmp_file()->
+	TmpFile = mktemp(),
+	ok = file:write_file(TmpFile, <<>>),
+	%io:format("Before TmpFile = ~p~n",[TmpFile]),
+	file(TmpFile)
+	%io:format("After TmpFile = ~p~n",[TmpFile]),
+	%TmpFile,.
+	.
+
+
 
 %file1(Name) ->
 %     io:format("Name = ~p~n",[Name])
