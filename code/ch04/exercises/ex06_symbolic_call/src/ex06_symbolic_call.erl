@@ -6,13 +6,16 @@ mktemp() ->
     mktemp("tmp").
 
 -spec mktemp(Prefix) -> Result
-   when Prefix   :: string(),
-        Result   :: TempFile  :: file:filename().
-		
+    when Prefix :: string(),
+         Result :: (TempFile :: file:filename()).
 mktemp(Prefix) ->
-    Rand = integer_to_list(binary:decode_unsigned(crypto:strong_rand_bytes(8)), 36),
-	TempDir = filename:basedir(user_cache, Prefix),
-	os:cmd("mkdir " ++ "\"" ++ TempDir ++ "\""),
-			
-	TempFilePath = filename:join(TempDir, Rand),
-	TempFilePath.
+    Rand =
+        integer_to_list(binary:decode_unsigned(
+                            crypto:strong_rand_bytes(8)),
+                        36),
+    TempDir = filename:basedir(user_cache, Prefix),
+    os:cmd("mkdir " ++ "\"" ++ TempDir ++ "\""),
+
+    TempFilePath = filename:join(TempDir, Rand),
+
+    TempFilePath.

@@ -1,11 +1,11 @@
 -module(prop_exercises).
 
 -include_lib("proper/include/proper.hrl").
+-compile([{nowarn_unused_function, [file_open/2, file_write/2]}]).
 
 %%%%%%%%%%%%%%%%%%
 %%% Properties %%%
 %%%%%%%%%%%%%%%%%%
-
 
 %%%%%%%%%%%%%%%
 %%% Helpers %%%
@@ -24,4 +24,3 @@ file_write(Fd, Data) ->
 %%%%%%%%%%%%%%%%%%
 %%% Generators %%%
 %%%%%%%%%%%%%%%%%%
-

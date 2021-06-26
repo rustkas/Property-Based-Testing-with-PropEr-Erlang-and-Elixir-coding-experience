@@ -30,5 +30,5 @@ Format
 PropEr test
 -----
 	
-	$ rebar3 proper -m prop_solutions -p prop_make_tmp_file -n 1
+	$ rebar3 proper -m prop_solutions -p prop_make_tmp_file
 

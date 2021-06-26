@@ -39,4 +39,5 @@ PropEr test
 	$ rebar3 proper -m prop_mktemp -p prop_tmp_write_to_file2 -n 1
 	
 	$ rebar3 proper -m prop_solutions -p prop_make_tmp_file -n 1
+	$ rebar3 proper -m prop_solutions -p prop_make_tmp_file
 
