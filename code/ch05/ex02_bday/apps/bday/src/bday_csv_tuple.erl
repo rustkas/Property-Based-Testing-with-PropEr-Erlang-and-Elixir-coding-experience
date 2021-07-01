@@ -8,12 +8,10 @@
 encode([]) ->
     "";
 encode(TupleList) ->
-    Keys = lists:join(",", [escape(Name) || Name <- maps:keys(hd(TupleList))]),
-    Vals =
-        [lists:join(",", [escape(Field) || Field <- maps:values(Map)])
-         || Map <- TupleList],
-
-    lists:flatten([Keys, "\r\n", lists:join("\r\n", Vals)]).
+    Keys = get_csv_keys(TupleList),
+    Values = get_csv_values(TupleList),
+    Result = lists:flatten([Keys, "\r\n", Values]),
+	Result.
 
 %% @doc Take a string that represents a valid CSV data dump
 %% and turn it into a list of maps with the header entries as keys
@@ -31,11 +29,40 @@ decode(CSV) ->
 %%% PRIVATE %%%
 %%%%%%%%%%%%%%%
 
+%% @private divide list to two
+divide_list(N, List) when N >= 1, length(List) >= 1 ->
+    divide_list(N, List, []).
+
+%% @private divide list to two
+divide_list(N, [], Acc) ->
+    Acc;
+divide_list(N, List, Acc) ->
+    {NewSubList, NewList} = lists:split(N, List),
+    divide_list(N, NewList, [NewSubList | Acc]).
+
 %% @private return sorted keys
 get_csv_keys(TupleList) ->
     UsortedKeys = proplists:get_keys(TupleList),
-	EscapedKeys = lists:map(fun(Key) -> escape(Key) end, UsortedKeys),
-    lists:sort(EscapedKeys).
+    EscapedKeys = lists:map(fun(Key) -> escape(Key) end, UsortedKeys),
+    SortedKeys = lists:sort(EscapedKeys),
+	JoinedList = lists:join(",", SortedKeys),
+	lists:flatten(JoinedList).
+
+%% @private return string of values
+get_csv_values(TupleList) ->
+    AllValuesList = lists:map(fun(Tuple) -> element(2, Tuple) end, TupleList),
+    AllEscapedValuesList =
+        lists:map(fun(Value) -> escape(Value) end, AllValuesList),
+    DividedLists = divide_list(3, AllEscapedValuesList),
+    DividedListsWithRowEnd =
+        lists:map(fun(ListItem) ->
+                     JoinedList = lists:join(",", ListItem),
+                     lists:append(JoinedList, "\r\n")
+                  end,
+                  DividedLists),
+
+    OneString = lists:flatten(DividedListsWithRowEnd),
+    OneString.
 
 %% @private return a possibly escaped (if necessary) field or name
 -spec escape(string()) -> string().
@@ -316,7 +343,7 @@ get_keys_02_test() ->
          {"ccc", "xxx"}],
 
     Keys = get_csv_keys(TupleList),
-    ?assertEqual(["aaa", "bbb", "ccc"], Keys).
+    ?assertEqual("aaa,bbb,ccc", Keys).
 
     %?debugFmt("Keys = ~p~n", [Keys]).
 
@@ -333,7 +360,25 @@ get_values_01_test() ->
         [[[Values] || Values <- proplists:get_all_values(Key, TupleList)]
          || Key <- Keys],
     AllValuesList.
+
     %?debugFmt("AllValuesList = ~p~n", [AllValuesList]).
+
+divide_list_01_test() ->
+    Result = divide_list(1, [1, 1]),
+    ?assertEqual([[1], [1]], Result).
+
+divide_list_02_test() ->
+    Result = divide_list(2, [1, 2, 1, 2]),
+    ?assertEqual([[1, 2], [1, 2]], Result).
+
+divide_list_03_test() ->
+    Result = divide_list(3, [1, 2, 3, 1, 2, 3]),
+    ?assertEqual([[1, 2, 3], [1, 2, 3]], Result).
+
+divide_list_04_test() ->
+    List = ["zzz", "yyy", "xxx", "zzz", "yyy", "xxx"],
+    Result = divide_list(3, List),
+    ?assertEqual([["zzz", "yyy", "xxx"], ["zzz", "yyy", "xxx"]], Result).
 
 get_values_02_test() ->
     TupleList =
@@ -343,15 +388,62 @@ get_values_02_test() ->
          {"aaa", "zzz"},
          {"bbb", "yyy"},
          {"ccc", "xxx"}],
-    
-	AllValuesList = lists:map(fun(Tuple) -> element(2, Tuple) end,TupleList),
-    AllEscapedValuesList = lists:map(fun(Value) -> escape(Value) end, AllValuesList),
-    %String = string:join(AllEscapedValuesList, ", "),
-	String = lists:join(",", AllEscapedValuesList),
-	OneString = lists:flatten(String),
-	%?assertEqual("zzz,yyy,xxx,zzz,yyy,xxx", OneString).
-    ?debugFmt("AllEscapedValuesList = ~p~n", [AllEscapedValuesList]),
-    ?debugFmt("String = ~p~n", [String]),
-	?debugFmt("OneString = ~p~n", [OneString]).
 
+    AllValuesList = lists:map(fun(Tuple) -> element(2, Tuple) end, TupleList),
+    AllEscapedValuesList =
+        lists:map(fun(Value) -> escape(Value) end, AllValuesList),
+    DividedLists = divide_list(3, AllEscapedValuesList),
+    DividedListsWithRowEnd =
+        lists:map(fun(ListItem) ->
+                     JoinedList = lists:join(",", ListItem),
+                     lists:append(JoinedList, "\r\n")
+                  end,
+                  DividedLists),
+
+    OneString = lists:flatten(DividedListsWithRowEnd),
+    ?assertEqual("zzz,yyy,xxx\r\nzzz,yyy,xxx\r\n", OneString).
+
+    %?debugFmt("AllEscapedValuesList = ~p~n", [AllEscapedValuesList]),
+    %?debugFmt("DividedListsWithRowEnd = ~p~n", [DividedListsWithRowEnd]).
+    %?debugFmt("OneString = ~p~n", [OneString]).
+
+get_csv_values_01_test() ->
+    TupleList =
+        [{"aaa", "zzz"},
+         {"bbb", "yyy"},
+         {"ccc", "xxx"},
+         {"aaa", "zzz"},
+         {"bbb", "yyy"},
+         {"ccc", "xxx"}],
+    OneString = get_csv_values(TupleList),
+    ?assertEqual("zzz,yyy,xxx\r\nzzz,yyy,xxx\r\n", OneString).
+
+emulate_encode_01_test() ->
+    TupleList =
+        [{"aaa", "zzz"},
+         {"bbb", "yyy"},
+         {"ccc", "xxx"},
+         {"aaa", "zzz"},
+         {"bbb", "yyy"},
+         {"ccc", "xxx"}],
+
+    Keys = get_csv_keys(TupleList),
+    Values = get_csv_values(TupleList),
+    Result = lists:flatten([Keys, "\r\n", Values]),
+    %?debugFmt("Ecode = ~p~n", [Result]).
+    ?assertEqual("aaa,bbb,ccc\r\nzzz,yyy,xxx\r\nzzz,yyy,xxx\r\n", Result).
+	
+emulate_01_test() ->
+    TupleList =
+        [{"aaa", "zzz"},
+         {"bbb", "yyy"},
+         {"ccc", "xxx"},
+         {"aaa", "zzz"},
+         {"bbb", "yyy"},
+         {"ccc", "xxx"}],
+
+    Result = encode(TupleList),
+    %?debugFmt("Ecode = ~p~n", [Result]).
+    ?assertEqual("aaa,bbb,ccc\r\nzzz,yyy,xxx\r\nzzz,yyy,xxx\r\n", Result).	
+	
 -endif.
