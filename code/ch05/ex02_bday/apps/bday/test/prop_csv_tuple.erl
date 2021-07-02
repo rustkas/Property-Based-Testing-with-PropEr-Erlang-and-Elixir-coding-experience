@@ -1,25 +1,17 @@
--module(prop_csv).
+-module(prop_csv_tuple).
 
 -include_lib("proper/include/proper.hrl").
-
--export([csv_source/0]).
 
 %%%%%%%%%%%%%%%%%%
 %%% Properties %%%
 %%%%%%%%%%%%%%%%%%
-prop_roundtrip() ->
-    ?FORALL(Maps,
-            csv_source(),
-            Maps
-            =:= bday_csv:decode(
-                    bday_csv:encode(Maps))).
 
-prop_roundtrip_01() ->
-    ?FORALL(Maps,
-            csv_source_01(),
-            Maps
-            =:= bday_csv:decode(
-                    bday_csv:encode(Maps))).
+prop_roundtrip() ->
+    ?FORALL(TupleLists,
+            csv_source(),
+            TupleLists
+            =:= bday_csv_tuple:decode(
+                    bday_csv_tuple:encode(TupleLists))).
 
 %%%%%%%%%%%%%%%
 %%% Helpers %%%
@@ -31,6 +23,7 @@ textdata() ->
 %%%%%%%%%%%%%%%%%%
 %%% Generators %%%
 %%%%%%%%%%%%%%%%%%
+
 unquoted_text() ->
     list(elements(textdata())).
 
@@ -49,22 +42,10 @@ header(Size) ->
 record(Size) ->
     vector(Size, field()).
 
-
-
-
-%csv_source() ->
-%    ?LET(Size,
-%         pos_integer(),
-%         ?LET(Keys, header(Size + 1), list(entry(Size + 1, Keys)))).
-
 entry(Size, Keys) ->
-    ?LET(Vals,
-         record(Size),
-         maps:from_list(
-             lists:zip(Keys, Vals))).
+    ?LET(Vals, record(Size), lists:zip(Keys, Vals)).
 
 csv_source() ->
-    ?LET(Size, pos_integer(), ?LET(Keys, header(Size), list(entry(Size, Keys)))).
-	
-csv_source_01() ->
-    ?LET(Keys, header(1), list(entry(1, Keys))).	
+    ?LET(Size,
+         pos_integer(),
+         ?LET(Keys, header(Size + 1), list(entry(Size + 1, Keys)))).

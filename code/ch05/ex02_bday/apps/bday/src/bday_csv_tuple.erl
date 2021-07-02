@@ -9,7 +9,8 @@ encode([]) ->
     "";
 encode(TupleList) ->
     Keys = get_csv_keys(TupleList),
-    Values = get_csv_values(TupleList),
+	ColumnCount = length(Keys),
+    Values = get_csv_values(TupleList,ColumnCount),
     Result = lists:flatten([Keys, "\r\n", Values]),
     Result.
 
@@ -20,10 +21,9 @@ decode("") ->
     [];
 decode(CSV) ->
     {Headers, Rest} = decode_header(CSV),
-
     Rows = decode_rows(Rest),
-
-    [lists:zip(Headers, Row) || Row <- Rows].
+    ZipList = [lists:zip(Headers, Row) || Row <- Rows],
+    TupleList = lists:flatten(ZipList).
 
 %%%%%%%%%%%%%%%
 %%% PRIVATE %%%
@@ -49,11 +49,11 @@ get_csv_keys(TupleList) ->
     lists:flatten(JoinedList).
 
 %% @private return string of values
-get_csv_values(TupleList) ->
+get_csv_values(TupleList,ColumnCount) ->
     AllValuesList = lists:map(fun(Tuple) -> element(2, Tuple) end, TupleList),
     AllEscapedValuesList =
         lists:map(fun(Value) -> escape(Value) end, AllValuesList),
-    DividedLists = divide_list(3, AllEscapedValuesList),
+    DividedLists = divide_list(ColumnCount, AllEscapedValuesList),
     DividedListsWithRowEnd =
         lists:map(fun(ListItem) ->
                      JoinedList = lists:join(",", ListItem),
@@ -479,7 +479,7 @@ get_csv_values_01_test() ->
          {"aaa", "zzz"},
          {"bbb", "yyy"},
          {"ccc", "xxx"}],
-    OneString = get_csv_values(TupleList),
+    OneString = get_csv_values(TupleList,3),
     ?assertEqual("zzz,yyy,xxx\r\nzzz,yyy,xxx\r\n", OneString).
 
 emulate_encode_01_test() ->
@@ -492,7 +492,7 @@ emulate_encode_01_test() ->
          {"ccc", "xxx"}],
 
     Keys = get_csv_keys(TupleList),
-    Values = get_csv_values(TupleList),
+    Values = get_csv_values(TupleList,3),
     Result = lists:flatten([Keys, "\r\n", Values]),
     %?debugFmt("Ecode = ~p~n", [Result]).
     ?assertEqual("aaa,bbb,ccc\r\nzzz,yyy,xxx\r\nzzz,yyy,xxx\r\n", Result).
