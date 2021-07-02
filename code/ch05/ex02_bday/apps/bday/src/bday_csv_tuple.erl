@@ -160,7 +160,7 @@ decode_quoted([$", $\r, $\n | Rest], Acc) ->
 decode_quoted([$", $, | Rest], Acc) ->
     {ok, Acc ++ [$"], Rest};
 decode_quoted([$", $" | Rest], Acc) ->
-    decode_quoted(Rest, Acc);
+    decode_quoted(Rest, Acc ++ [$"]);
 decode_quoted([Char | Rest], Acc) ->
     decode_quoted(Rest, Acc ++ [Char]).
 
@@ -203,6 +203,11 @@ decode_quoted_01_test() ->
     String = "\"a\r\nbc\"",
     Result = decode_field(String),
     ?assertEqual({done, "\"a\r\nbc\"", ""}, Result).
+
+decode_quoted_02_test() ->
+    String = "\"a\"\"a\"\r\nbc",
+    Result = decode_field(String),
+    ?assertEqual({done, "\"a\"a\"", "bc"}, Result).
 
 decode_field_01_test() ->
     Result = decode_field("aaa,bbb"),
