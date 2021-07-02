@@ -36,7 +36,7 @@ rfc_double_quote_escape_test() ->
     ?assertEqual(Expected, Result).
 
 %% @doc this counterexample is taken literally from the RFC
-dupe_keys_unsupported_test() ->
+dupe_keys_test() ->
     CSV = "field_name,field_name,field_name\r\n"
           "aaa,bbb,ccc\r\n"
           "zzz,yyy,xxx\r\n",
