@@ -11,7 +11,7 @@ encode(TupleList) ->
     Keys = get_csv_keys(TupleList),
     Values = get_csv_values(TupleList),
     Result = lists:flatten([Keys, "\r\n", Values]),
-	Result.
+    Result.
 
 %% @doc Take a string that represents a valid CSV data dump
 %% and turn it into a list of maps with the header entries as keys
@@ -45,8 +45,8 @@ get_csv_keys(TupleList) ->
     UsortedKeys = proplists:get_keys(TupleList),
     EscapedKeys = lists:map(fun(Key) -> escape(Key) end, UsortedKeys),
     SortedKeys = lists:sort(EscapedKeys),
-	JoinedList = lists:join(",", SortedKeys),
-	lists:flatten(JoinedList).
+    JoinedList = lists:join(",", SortedKeys),
+    lists:flatten(JoinedList).
 
 %% @private return string of values
 get_csv_values(TupleList) ->
@@ -84,6 +84,8 @@ escapable(String) ->
 -spec do_escape(string()) -> string().
 do_escape([]) ->
     [];
+do_escape([$", $" | Str]) ->
+    [$", $", $", $" | do_escape(Str)];
 do_escape([$" | Str]) ->
     [$", $" | do_escape(Str)];
 do_escape([Char | Rest]) ->
@@ -114,35 +116,18 @@ decode_row(String) ->
 decode_row(String, Acc) ->
     case decode_field(String) of
         {ok, Field, Rest} ->
-            decode_row(Rest, [Field | Acc]);
+            decode_row(Rest, Acc ++ [Field]);
         {done, Field, Rest} ->
-            Result = lists:reverse([Field | Acc]),
+            Result = Acc ++ [Field],
             {Result, Rest}
     end.
 
 %% @private Decode a field; redirects to decoding quoted or unquoted text
 -spec decode_field(string()) -> {ok | done, string(), string()}.
-decode_field([$" | Rest]) ->
-    decode_quoted(Rest);
+decode_field([$" | Rest] = Input) ->
+    decode_quoted(Input);
 decode_field(String) ->
     decode_unquoted(String).
-
-%% @private Decode a quoted string
--spec decode_quoted(string()) -> {ok | done, string(), string()}.
-decode_quoted(String) ->
-    decode_quoted(String, []).
-
--spec decode_quoted(string(), [char()]) -> {ok | done, string(), string()}.
-decode_quoted([$"], Acc) ->
-    {done, Acc, ""};
-decode_quoted([$", $\r, $\n | Rest], Acc) ->
-    {done, Acc, Rest};
-decode_quoted([$", $, | Rest], Acc) ->
-    {ok, Acc, Rest};
-decode_quoted([$", $" | Rest], Acc) ->
-    decode_quoted(Rest, [$" | Acc]);
-decode_quoted([Char | Rest], Acc) ->
-    decode_quoted(Rest, [Char | Acc]).
 
 %% @private Decode an unquoted string
 -spec decode_unquoted(string()) -> {ok | done, string(), string()}.
@@ -160,7 +145,24 @@ decode_unquoted([$\r, $\n | Rest], Acc) ->
 decode_unquoted([$, | Rest], Acc) ->
     {ok, Acc, Rest};
 decode_unquoted([Char | Rest], Acc) ->
-    decode_unquoted(Rest, [Char | Acc]).
+    decode_unquoted(Rest, Acc ++ [Char]).
+
+%% @private Decode a quoted string
+-spec decode_quoted(string()) -> {ok | done, string(), string()}.
+decode_quoted(String) ->
+    decode_quoted(String, []).
+
+-spec decode_quoted(string(), [char()]) -> {ok | done, string(), string()}.
+decode_quoted([$"], Acc) ->
+    {done, Acc ++ [$"], ""};
+decode_quoted([$", $\r, $\n | Rest], Acc) ->
+    {done, Acc ++ [$"], Rest};
+decode_quoted([$", $, | Rest], Acc) ->
+    {ok, Acc ++ [$"], Rest};
+decode_quoted([$", $" | Rest], Acc) ->
+    decode_quoted(Rest, Acc);
+decode_quoted([Char | Rest], Acc) ->
+    decode_quoted(Rest, Acc ++ [Char]).
 
 %%
 %% Tests
@@ -196,6 +198,11 @@ decode_unquoted_05_test() ->
 decode_unquoted_06_test() ->
     Result = decode_unquoted("aaa,bbb"),
     ?assertEqual({ok, "aaa", "bbb"}, Result).
+
+decode_quoted_01_test() ->
+    String = "\"a\r\nbc\"",
+    Result = decode_field(String),
+    ?assertEqual({done, "\"a\r\nbc\"", ""}, Result).
 
 decode_field_01_test() ->
     Result = decode_field("aaa,bbb"),
@@ -279,9 +286,33 @@ decode_rows_03_test() ->
     Rows = decode_rows(CSV),
     ?assertEqual([["aaa", "bbb", "ccc"], ["zzz", "yyy", "xxx"]], Rows).
 
+decode_rows_03_01_test() ->
+    CSV = "aaa,bbb,ccc\r\nzzz,yyy,xxx\r\n",
+    Rows = decode_rows(CSV),
+    ?assertEqual([["aaa", "bbb", "ccc"], ["zzz", "yyy", "xxx"]], Rows).
+
+decode_rows_03_02_test() ->
+    CSV = "\"ab\r\nc1\"",
+    Rows = decode_rows(CSV),
+    ?assertEqual([["\"ab\r\nc1\""]], Rows).
+
+decode_rows_03_03_test() ->
+    CSV = "\"Joe\r\nArmstrong\"\r\nErlang",
+    Rows = decode_rows(CSV),
+    ?assertEqual([["\"Joe\r\nArmstrong\""], ["Erlang"]], Rows).
+
+decode_rows_03_04_test() ->
+    CSV = "\"Joe\r\nArmstrong\"\r\n\"Fred\r\nHebert\"",
+    Rows = decode_rows(CSV),
+    ?assertEqual([["\"Joe\r\nArmstrong\""], ["\"Fred\r\nHebert\""]], Rows).
+
 decode_header_01_test() ->
     Result = decode_header("aaa,bbb,ccc\r\nzzz,yyy,xxx"),
     ?assertEqual({["aaa", "bbb", "ccc"], "zzz,yyy,xxx"}, Result).
+
+decode_header_01_01_test() ->
+    Result = decode_header("aaa,bbb,ccc\r\nzzz,yyy,xxx\r\n"),
+    ?assertEqual({["aaa", "bbb", "ccc"], "zzz,yyy,xxx\r\n"}, Result).
 
 decode_01_test() ->
     Result = decode(""),
@@ -294,6 +325,13 @@ decode_02_test() ->
     ?assertEqual(["aaa", "bbb", "ccc"], Headers),
     ?assertEqual([["zzz", "yyy", "xxx"]], Rows).
 
+decode_02_01_test() ->
+    CSV = "aaa,bbb,ccc\r\nzzz,yyy,xxx\r\n",
+    {Headers, Rest} = decode_header(CSV),
+    Rows = decode_rows(Rest),
+    ?assertEqual(["aaa", "bbb", "ccc"], Headers),
+    ?assertEqual([["zzz", "yyy", "xxx"]], Rows).
+
 decode_03_test() ->
     CSV = "aaa,bbb,ccc\r\nzzz,yyy,xxx\r\nzzz,yyy,xxx",
     {Headers, Rest} = decode_header(CSV),
@@ -301,8 +339,29 @@ decode_03_test() ->
     ?assertEqual(["aaa", "bbb", "ccc"], Headers),
     ?assertEqual([["zzz", "yyy", "xxx"], ["zzz", "yyy", "xxx"]], Rows).
 
+decode_03_01_test() ->
+    CSV = "aaa,bbb,ccc\r\nzzz,yyy,xxx\r\nzzz,yyy,xxx\r\n",
+    {Headers, Rest} = decode_header(CSV),
+    Rows = decode_rows(Rest),
+    ?assertEqual(["aaa", "bbb", "ccc"], Headers),
+    ?assertEqual([["zzz", "yyy", "xxx"], ["zzz", "yyy", "xxx"]], Rows).
+
 decode_04_test() ->
     CSV = "aaa,bbb,ccc\r\nzzz,yyy,xxx\r\nzzz,yyy,xxx",
+    {Headers, Rest} = decode_header(CSV),
+    Rows = decode_rows(Rest),
+    Zip = lists:flatten([lists:zip(Headers, Row) || Row <- Rows]),
+
+    ?assertEqual([{"aaa", "zzz"},
+                  {"bbb", "yyy"},
+                  {"ccc", "xxx"},
+                  {"aaa", "zzz"},
+                  {"bbb", "yyy"},
+                  {"ccc", "xxx"}],
+                 Zip).
+
+decode_04_01_test() ->
+    CSV = "aaa,bbb,ccc\r\nzzz,yyy,xxx\r\nzzz,yyy,xxx\r\n",
     {Headers, Rest} = decode_header(CSV),
     Rows = decode_rows(Rest),
     Zip = lists:flatten([lists:zip(Headers, Row) || Row <- Rows]),
@@ -432,8 +491,8 @@ emulate_encode_01_test() ->
     Result = lists:flatten([Keys, "\r\n", Values]),
     %?debugFmt("Ecode = ~p~n", [Result]).
     ?assertEqual("aaa,bbb,ccc\r\nzzz,yyy,xxx\r\nzzz,yyy,xxx\r\n", Result).
-	
-emulate_01_test() ->
+
+encode_01_test() ->
     TupleList =
         [{"aaa", "zzz"},
          {"bbb", "yyy"},
@@ -444,6 +503,11 @@ emulate_01_test() ->
 
     Result = encode(TupleList),
     %?debugFmt("Ecode = ~p~n", [Result]).
-    ?assertEqual("aaa,bbb,ccc\r\nzzz,yyy,xxx\r\nzzz,yyy,xxx\r\n", Result).	
-	
+    ?assertEqual("aaa,bbb,ccc\r\nzzz,yyy,xxx\r\nzzz,yyy,xxx\r\n", Result).
+
+do_escape_01_test() ->
+    String = "b\"\"bb",
+    Result = do_escape(String),
+    ?assertEqual("b\"\"\"\"bb", Result).
+
 -endif.

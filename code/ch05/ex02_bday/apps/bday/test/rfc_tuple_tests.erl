@@ -7,10 +7,19 @@
 
 -include_lib("eunit/include/eunit.hrl").
 
-%rfc_record_per_line_test() ->
-%	?debugFmt("~p~n",[bday_csv_tuple:decode("I will share my solutions. ,bbb,ccc\r\nzzz,yyy,xxx")]).
+rfc_record_per_line_test() ->
+    Expected = [[{"aaa", "zzz"}, {"bbb", "yyy"}, {"ccc", "xxx"}]],
+    Result = bday_csv_tuple:decode("aaa,bbb,ccc\r\nzzz,yyy,xxx\r\n"),
+    ?assertEqual(Expected, Result).
 
-    %?assertEqual([{"aaa","zzz"}, {"bbb","yyy"}, {"ccc", "xxx"}],
-    %             bday_csv_tuple:decode("aaa,bbb,ccc\r\nzzz,yyy,xxx")).
+rfc_optional_trailing_crlf_test() ->
+    Expected = [[{"aaa", "zzz"}, {"bbb", "yyy"}, {"ccc", "xxx"}]],
+    Result = bday_csv_tuple:decode("aaa,bbb,ccc\r\nzzz,yyy,xxx"),
+    ?assertEqual(Expected, Result).
+
+rfc_double_quote_test() ->
+    Expected = [[{"\"aaa\"", "zzz"}, {"\"bbb\"", "yyy"}, {"\"ccc\"", "xxx"}]],
+    Result = bday_csv_tuple:decode("\"aaa\",\"bbb\",\"ccc\"\r\nzzz,yyy,xxx"),
+    ?assertEqual(Expected, Result).
 
 -endif.

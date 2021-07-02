@@ -23,9 +23,8 @@ Proper
 
 EUnit
 -----
-	$ rebar3 eunit -v --app bday -m rfc_tests
-	$ rebar3 eunit -v --app bday -m rfc_tuple_tests
 	$ rebar3 eunit -v -m bday_csv_tuple
+	$ rebar3 eunit -v -m rfc_tuple_tests
 	
 
 Build
