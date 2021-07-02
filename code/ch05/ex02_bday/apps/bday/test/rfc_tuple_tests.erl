@@ -22,4 +22,10 @@ rfc_double_quote_test() ->
     Result = bday_csv_tuple:decode("\"aaa\",\"bbb\",\"ccc\"\r\nzzz,yyy,xxx"),
     ?assertEqual(Expected, Result).
 
+
+rfc_crlf_escape_test() ->
+    Expected = [[{"\"aaa\"", "zzz"}, {"\"b\r\nbb\"","yyy"}, {"\"ccc\"", "xxx"}]],
+	Result = bday_csv_tuple:decode("\"aaa\",\"b\r\nbb\",\"ccc\"\r\nzzz,yyy,xxx"),
+	?assertEqual(Expected, Result).
+
 -endif.
