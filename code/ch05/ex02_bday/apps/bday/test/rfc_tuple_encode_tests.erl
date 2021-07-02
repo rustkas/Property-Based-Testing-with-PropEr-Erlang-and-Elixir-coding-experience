@@ -9,7 +9,12 @@
 
 rfc_empty_01_test() ->
     InputList = [{[95], []}, {[], []}],
+    Result = bday_csv_tuple:encode(InputList).
+    %?debugFmt("~p~n", [Result]).
+
+
+rfc_empty_02_test() ->
+    InputList = [{[],[]},{[],[]}],
     Result = bday_csv_tuple:encode(InputList),
     ?debugFmt("~p~n", [Result]).
-
 -endif.

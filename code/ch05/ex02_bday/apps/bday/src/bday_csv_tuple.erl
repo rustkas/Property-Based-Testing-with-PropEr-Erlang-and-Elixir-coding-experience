@@ -8,8 +8,7 @@
 encode([]) ->
     "";
 encode(TupleList) ->
-    Keys = get_csv_keys(TupleList),
-	ColumnCount = length(Keys),
+    {Keys,ColumnCount} = get_csv_keys(TupleList),
     Values = get_csv_values(TupleList,ColumnCount),
     Result = lists:flatten([Keys, "\r\n", Values]),
     Result.
@@ -30,7 +29,7 @@ decode(CSV) ->
 %%%%%%%%%%%%%%%
 
 %% @private divide list to two
-divide_list(N, List) when N >= 1, length(List) >= 1 ->
+divide_list(N, List) when N >= 0, length(List) >= 0 ->
     divide_list(N, List, []).
 
 %% @private divide list to two
@@ -46,7 +45,9 @@ get_csv_keys(TupleList) ->
     EscapedKeys = lists:map(fun(Key) -> escape(Key) end, UsortedKeys),
     SortedKeys = lists:sort(EscapedKeys),
     JoinedList = lists:join(",", SortedKeys),
-    lists:flatten(JoinedList).
+    KeysString = lists:flatten(JoinedList),
+	ColumnCount = length(SortedKeys),
+	{KeysString,ColumnCount}.
 
 %% @private return string of values
 get_csv_values(TupleList,ColumnCount) ->
@@ -406,7 +407,7 @@ get_keys_02_test() ->
          {"bbb", "yyy"},
          {"ccc", "xxx"}],
 
-    Keys = get_csv_keys(TupleList),
+    {Keys,_} = get_csv_keys(TupleList),
     ?assertEqual("aaa,bbb,ccc", Keys).
 
     %?debugFmt("Keys = ~p~n", [Keys]).
@@ -419,7 +420,7 @@ get_values_01_test() ->
          {"aaa", "zzz"},
          {"bbb", "yyy"},
          {"ccc", "xxx"}],
-    Keys = get_csv_keys(TupleList),
+    {Keys,_} = get_csv_keys(TupleList),
     AllValuesList =
         [[[Values] || Values <- proplists:get_all_values(Key, TupleList)]
          || Key <- Keys],
@@ -491,8 +492,8 @@ emulate_encode_01_test() ->
          {"bbb", "yyy"},
          {"ccc", "xxx"}],
 
-    Keys = get_csv_keys(TupleList),
-    Values = get_csv_values(TupleList,3),
+    {Keys,ColumnCount} = get_csv_keys(TupleList),
+    Values = get_csv_values(TupleList,ColumnCount),
     Result = lists:flatten([Keys, "\r\n", Values]),
     %?debugFmt("Ecode = ~p~n", [Result]).
     ?assertEqual("aaa,bbb,ccc\r\nzzz,yyy,xxx\r\nzzz,yyy,xxx\r\n", Result).
