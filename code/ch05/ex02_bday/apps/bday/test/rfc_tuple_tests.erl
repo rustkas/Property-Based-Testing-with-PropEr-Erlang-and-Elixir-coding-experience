@@ -10,8 +10,9 @@
 rfc_record_per_line_test() ->
     Expected = [{"aaa", "zzz"}, {"bbb", "yyy"}, {"ccc", "xxx"}],
     Result = bday_csv_tuple:decode("aaa,bbb,ccc\r\nzzz,yyy,xxx\r\n"),
-    ?debugFmt("~p~n",[Result]).
-	%?assertEqual(Expected, Result).
+    ?debugFmt("~p~n", [Result]).
+
+        %?assertEqual(Expected, Result).
 
 rfc_optional_trailing_crlf_test() ->
     Expected = [{"aaa", "zzz"}, {"bbb", "yyy"}, {"ccc", "xxx"}],

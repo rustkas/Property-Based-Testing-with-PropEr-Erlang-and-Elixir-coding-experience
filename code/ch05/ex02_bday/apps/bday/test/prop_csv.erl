@@ -14,13 +14,6 @@ prop_roundtrip() ->
             =:= bday_csv:decode(
                     bday_csv:encode(Maps))).
 
-prop_roundtrip_01() ->
-    ?FORALL(Maps,
-            csv_source_01(),
-            Maps
-            =:= bday_csv:decode(
-                    bday_csv:encode(Maps))).
-
 %%%%%%%%%%%%%%%
 %%% Helpers %%%
 %%%%%%%%%%%%%%%

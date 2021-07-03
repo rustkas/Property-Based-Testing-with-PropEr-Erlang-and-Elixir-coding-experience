@@ -21,7 +21,35 @@ Proper
 	$ rebar3 proper -d apps/bday/test -n 1000
 	$ rebar3 proper -d apps/bday/test -p prop_roundtrip  -n 1000
 	
-	$ rebar3 proper -d apps/bday/test -m prop_csv_tuple  -n 1000
+	$ rebar3 proper -d apps/bday/test -m prop_csv_tuple -n 1
+	$ rebar3 proper -d apps/bday/test -m prop_csv_tuple -n 1000
+	$ rebar3 proper -d apps/bday/test -m prop_csv_tuple -p prop_csv_source -n 1
+	$ rebar3 proper -d apps/bday/test -m prop_csv_tuple -p prop_entry_01 -n 1
+	
+	$ rebar3 proper -d apps/bday/test -m prop_csv_tuple -p prop_unquoted_text -n 1000
+	$ rebar3 proper -d apps/bday/test -m prop_csv_tuple -p prop_quotable_text -n 1000
+	$ rebar3 proper -d apps/bday/test -m prop_csv_tuple -p prop_field -n 1000
+	$ rebar3 proper -d apps/bday/test -m prop_csv_tuple -p prop_name -n 1000
+	$ rebar3 proper -d apps/bday/test -m prop_csv_tuple -p prop_header -n 1000
+	$ rebar3 proper -d apps/bday/test -m prop_csv_tuple -p prop_record -n 1000
+	$ rebar3 proper -d apps/bday/test -m prop_csv_tuple -p prop_entry -n 1000
+	
+Run PropEr generators
+-----
+	$ rebar3 as test shell
+	proper_gen:pick(prop_csv:csv_source()).
+	proper_gen:pick(prop_csv_tuple:csv_source()).
+	proper_gen:pick(prop_csv_tuple:entry(5, ["fiedl1","fiedl2"])).
+	proper_gen:pick(prop_csv_tuple:entry(proper_types:integer(2,2), prop_csv_tuple:header(proper_types:integer(2,2)))).
+	proper_gen:pick(proper_types:integer(2,2)).
+	proper_gen:pick(prop_csv_tuple:header(proper_types:integer(2,2))).
+	
+	proper_gen:pick(prop_csv_tuple:unquoted_text()).
+	proper_gen:pick(prop_csv_tuple:quotable_text()).
+	proper_gen:pick(prop_csv_tuple:field()).
+	proper_gen:pick(prop_csv_tuple:name()).
+	
+	
 	
 	
 
