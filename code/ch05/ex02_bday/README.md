@@ -23,8 +23,7 @@ Proper
 	
 	$ rebar3 proper -d apps/bday/test -m prop_csv_tuple -n 1
 	$ rebar3 proper -d apps/bday/test -m prop_csv_tuple -n 1000
-	$ rebar3 proper -d apps/bday/test -m prop_csv_tuple -p prop_csv_source -n 1
-	$ rebar3 proper -d apps/bday/test -m prop_csv_tuple -p prop_entry_01 -n 1
+	
 	
 	$ rebar3 proper -d apps/bday/test -m prop_csv_tuple -p prop_unquoted_text -n 1000
 	$ rebar3 proper -d apps/bday/test -m prop_csv_tuple -p prop_quotable_text -n 1000
@@ -33,6 +32,10 @@ Proper
 	$ rebar3 proper -d apps/bday/test -m prop_csv_tuple -p prop_header -n 1000
 	$ rebar3 proper -d apps/bday/test -m prop_csv_tuple -p prop_record -n 1000
 	$ rebar3 proper -d apps/bday/test -m prop_csv_tuple -p prop_entry -n 1000
+	$ rebar3 proper -d apps/bday/test -m prop_csv_tuple -p prop_entry2 -n 1000
+	$ rebar3 proper -d apps/bday/test -m prop_csv_tuple -p prop_entry3 -n 1000
+	$ rebar3 proper -d apps/bday/test -m prop_csv_tuple -p prop_csv_source -n 1
+	$ rebar3 proper -d apps/bday/test -m prop_csv_tuple -p prop_roundtrip -n 1
 	
 Run PropEr generators
 -----

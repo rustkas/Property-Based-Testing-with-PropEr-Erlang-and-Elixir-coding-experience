@@ -7,10 +7,9 @@
 -spec encode([{string(), string()}]) -> string().
 encode([]) ->
     "";
-encode(TupleList) ->
-    {Keys, ColumnCount} = get_csv_keys(TupleList),
-
-    Values = get_csv_values(TupleList, ColumnCount),
+encode(DeepTupleList) ->
+    Keys = get_csv_keys(DeepTupleList),
+    Values = get_csv_values(DeepTupleList),
     Result = lists:flatten([Keys, "\r\n", Values]),
     Result.
 
@@ -41,33 +40,26 @@ divide_list(N, List, Acc) ->
     divide_list(N, NewList, [NewSubList | Acc]).
 
 %% @private return sorted keys
-get_csv_keys(TupleList) ->
-    UsortedKeys = proplists:get_keys(TupleList),
-    EscapedKeys = lists:map(fun(Key) -> escape(Key) end, UsortedKeys),
-    SortedKeys = lists:sort(EscapedKeys),
-    JoinedList = lists:join(",", SortedKeys),
+-spec get_csv_keys(DeepTupleList) -> SplitString when
+ DeepTupleList :: [[{string(),string()}]],
+ SplitString :: string().
+get_csv_keys(DeepTupleList) ->
+    FirstList = hd(DeepTupleList),
+    Keys =  lists:map(fun(Elem) -> element(1, Elem) end, FirstList),
+	JoinedList = lists:join(",", Keys),
     KeysString = lists:flatten(JoinedList),
-
-    ColumnCount = length(SortedKeys),
-    io:format("ColumnCount = ~p, TupleList = ~p~n", [ColumnCount, TupleList]),
-    true = ColumnCount < length(TupleList),
-    {KeysString, ColumnCount}.
+	KeysString.
 
 %% @private return string of values
-get_csv_values(TupleList, ColumnCount) ->
-    AllValuesList = lists:map(fun(Tuple) -> element(2, Tuple) end, TupleList),
-
-    AllEscapedValuesList =
-        lists:map(fun(Value) -> escape(Value) end, AllValuesList),
-    DividedLists = divide_list(ColumnCount, AllEscapedValuesList),
-    DividedListsWithRowEnd =
-        lists:map(fun(ListItem) ->
-                     JoinedList = lists:join(",", ListItem),
-                     lists:append(JoinedList, "\r\n")
-                  end,
-                  DividedLists),
-    OneString = lists:flatten(DividedListsWithRowEnd),
-    OneString.
+-spec get_csv_values(DeepTupleList) -> SplitString when
+ DeepTupleList :: [[{string(),string()}]],
+ SplitString :: string().
+get_csv_values(DeepTupleList) ->
+    ValuesLists = [ lists:map(fun(Elem) -> element(2, Elem) end, TupleList) || TupleList <- DeepTupleList],
+		ValuesList = lists:flatten(ValuesLists),
+		JoinedList = lists:join(",", ValuesList),
+		ValuesString = lists:flatten(JoinedList),
+		ValuesString.
 
 %% @private return a possibly escaped (if necessary) field or name
 -spec escape(string()) -> string().
@@ -176,348 +168,66 @@ decode_quoted([Char | Rest], Acc) ->
 
 -include_lib("eunit/include/eunit.hrl").
 
-%%%%%%%%%%%%%%%%
-%%% Decoding %%%
-%%%%%%%%%%%%%%%%
-
-decode_unquoted_01_test() ->
-    Result = decode_unquoted(""),
-    ?assertEqual({done, [], []}, Result).
-
-decode_unquoted_02_test() ->
-    Result = decode_unquoted("\r\n"),
-    ?assertEqual({done, [], []}, Result).
-
-decode_unquoted_03_test() ->
-    Result = decode_unquoted(","),
-    ?assertEqual({ok, [], []}, Result).
-
-decode_unquoted_04_test() ->
-    Result = decode_unquoted(",\r\n"),
-    ?assertEqual({ok, [], [$\r, $\n]}, Result).
-
-decode_unquoted_05_test() ->
-    Result = decode_unquoted("aaa"),
-    ?assertEqual({done, "aaa", []}, Result).
-
-decode_unquoted_06_test() ->
-    Result = decode_unquoted("aaa,bbb"),
-    ?assertEqual({ok, "aaa", "bbb"}, Result).
-
-decode_quoted_01_test() ->
-    String = "\"a\r\nbc\"",
-    Result = decode_field(String),
-    ?assertEqual({done, "\"a\r\nbc\"", ""}, Result).
-
-decode_quoted_02_test() ->
-    String = "\"a\"\"a\"\r\nbc",
-    Result = decode_field(String),
-    ?assertEqual({done, "\"a\"a\"", "bc"}, Result).
-
-decode_field_01_test() ->
-    Result = decode_field("aaa,bbb"),
-    ?assertEqual({ok, "aaa", "bbb"}, Result).
-
-decode_row_2_01_test() ->
-    F = fun Decode_row(String, Acc) ->
-                case decode_field(String) of
-                    {ok, Field, Rest} ->
-                        %?debugFmt("~p~n", [Field]),
-                        Decode_row(Rest, [Field | Acc]);
-                    {done, Field, Rest} ->
-                        %?debugFmt("~p~n", [Field]),
-                        Result = lists:reverse([Field | Acc]),
-                        {Result, Rest}
-                end
-        end,
-    String = "aaa,bbb",
-    Result = F(String, []),
-    ?assertEqual({["aaa", "bbb"], []}, Result).
-
-decode_row_1_01_test() ->
-    DecodeRow_2 =
-        fun Decode_row(String, Acc) ->
-                case decode_field(String) of
-                    {ok, Field, Rest} ->
-                        Decode_row(Rest, [Field | Acc]);
-                    {done, Field, Rest} ->
-                        Result = lists:reverse([Field | Acc]),
-                        {Result, Rest}
-                end
-        end,
-    DecodeRow_1 =
-        fun Decode_row(String) ->
-                DecodeRow_2(String, [])
-        end,
-
-    String = "aaa,bbb",
-    Result = DecodeRow_1(String),
-    ?assertEqual({["aaa", "bbb"], []}, Result).
-
-decode_row_01_test() ->
-    Result = decode_row("aaa,bbb"),
-    %?debugFmt("~p~n", [Result]),
-    ?assertEqual({["aaa", "bbb"], []}, Result).
-
-decode_rows_01_test() ->
-    Decode_rowsFun =
-        fun Decode_rows(String) ->
-                case decode_row(String) of
-                    {Row, ""} ->
-                        %?debugFmt("Function Result = ~p~n", [Row]),
-                        Row;
-                    {Row, Rest} ->
-                        %?debugFmt("Current Value = ~p~n", [Row]),
-                        [Row, Decode_rows(Rest)]
-                end
-        end,
-    _Result = Decode_rowsFun("aaa,bbb,ccc\r\nzzz,yyy,xxx").
-
-    %?debugFmt("Main Result = ~p~n", [_Result]).
-
-decode_rows_02_test() ->
-    Decode_rowsFun =
-        fun Decode_rows(String) ->
-                case decode_row(String) of
-                    {Row, ""} ->
-                        %?debugFmt("Function Result = ~p~n", [Row]),
-                        [Row];
-                    {Row, Rest} ->
-                        %?debugFmt("Current Value = ~p~n", [Row]),
-                        [Row | Decode_rows(Rest)]
-                end
-        end,
-    Result = Decode_rowsFun("aaa,bbb,ccc\r\nzzz,yyy,xxx\r\nzzz,yyy,xxx").
-
-        %?debugFmt("Main Result = ~p~n", [Result]).
-
-decode_rows_03_test() ->
-    CSV = "aaa,bbb,ccc\r\nzzz,yyy,xxx",
-    Rows = decode_rows(CSV),
-    ?assertEqual([["aaa", "bbb", "ccc"], ["zzz", "yyy", "xxx"]], Rows).
-
-decode_rows_03_01_test() ->
-    CSV = "aaa,bbb,ccc\r\nzzz,yyy,xxx\r\n",
-    Rows = decode_rows(CSV),
-    ?assertEqual([["aaa", "bbb", "ccc"], ["zzz", "yyy", "xxx"]], Rows).
-
-decode_rows_03_02_test() ->
-    CSV = "\"ab\r\nc1\"",
-    Rows = decode_rows(CSV),
-    ?assertEqual([["\"ab\r\nc1\""]], Rows).
-
-decode_rows_03_03_test() ->
-    CSV = "\"Joe\r\nArmstrong\"\r\nErlang",
-    Rows = decode_rows(CSV),
-    ?assertEqual([["\"Joe\r\nArmstrong\""], ["Erlang"]], Rows).
-
-decode_rows_03_04_test() ->
-    CSV = "\"Joe\r\nArmstrong\"\r\n\"Fred\r\nHebert\"",
-    Rows = decode_rows(CSV),
-    ?assertEqual([["\"Joe\r\nArmstrong\""], ["\"Fred\r\nHebert\""]], Rows).
-
-decode_header_01_test() ->
-    Result = decode_header("aaa,bbb,ccc\r\nzzz,yyy,xxx"),
-    ?assertEqual({["aaa", "bbb", "ccc"], "zzz,yyy,xxx"}, Result).
-
-decode_header_01_01_test() ->
-    Result = decode_header("aaa,bbb,ccc\r\nzzz,yyy,xxx\r\n"),
-    ?assertEqual({["aaa", "bbb", "ccc"], "zzz,yyy,xxx\r\n"}, Result).
-
-decode_01_test() ->
-    Result = decode(""),
-    ?assertEqual([], Result).
-
-decode_02_test() ->
-    CSV = "aaa,bbb,ccc\r\nzzz,yyy,xxx",
-    {Headers, Rest} = decode_header(CSV),
-    Rows = decode_rows(Rest),
-    ?assertEqual(["aaa", "bbb", "ccc"], Headers),
-    ?assertEqual([["zzz", "yyy", "xxx"]], Rows).
-
-decode_02_01_test() ->
-    CSV = "aaa,bbb,ccc\r\nzzz,yyy,xxx\r\n",
-    {Headers, Rest} = decode_header(CSV),
-    Rows = decode_rows(Rest),
-    ?assertEqual(["aaa", "bbb", "ccc"], Headers),
-    ?assertEqual([["zzz", "yyy", "xxx"]], Rows).
-
-decode_03_test() ->
-    CSV = "aaa,bbb,ccc\r\nzzz,yyy,xxx\r\nzzz,yyy,xxx",
-    {Headers, Rest} = decode_header(CSV),
-    Rows = decode_rows(Rest),
-    ?assertEqual(["aaa", "bbb", "ccc"], Headers),
-    ?assertEqual([["zzz", "yyy", "xxx"], ["zzz", "yyy", "xxx"]], Rows).
-
-decode_03_01_test() ->
-    CSV = "aaa,bbb,ccc\r\nzzz,yyy,xxx\r\nzzz,yyy,xxx\r\n",
-    {Headers, Rest} = decode_header(CSV),
-    Rows = decode_rows(Rest),
-    ?assertEqual(["aaa", "bbb", "ccc"], Headers),
-    ?assertEqual([["zzz", "yyy", "xxx"], ["zzz", "yyy", "xxx"]], Rows).
-
-decode_04_test() ->
-    CSV = "aaa,bbb,ccc\r\nzzz,yyy,xxx\r\nzzz,yyy,xxx",
-    {Headers, Rest} = decode_header(CSV),
-    Rows = decode_rows(Rest),
-    Zip = lists:flatten([lists:zip(Headers, Row) || Row <- Rows]),
-
-    ?assertEqual([{"aaa", "zzz"},
-                  {"bbb", "yyy"},
-                  {"ccc", "xxx"},
-                  {"aaa", "zzz"},
-                  {"bbb", "yyy"},
-                  {"ccc", "xxx"}],
-                 Zip).
-
-decode_04_01_test() ->
-    CSV = "aaa,bbb,ccc\r\nzzz,yyy,xxx\r\nzzz,yyy,xxx\r\n",
-    {Headers, Rest} = decode_header(CSV),
-    Rows = decode_rows(Rest),
-    Zip = lists:flatten([lists:zip(Headers, Row) || Row <- Rows]),
-
-    ?assertEqual([{"aaa", "zzz"},
-                  {"bbb", "yyy"},
-                  {"ccc", "xxx"},
-                  {"aaa", "zzz"},
-                  {"bbb", "yyy"},
-                  {"ccc", "xxx"}],
-                 Zip).
 
 %%%%%%%%%%%%%%%%
 %%% Encoding %%%
 %%%%%%%%%%%%%%%%
 
-get_keys_01_test() ->
-    TupleList =
-        [{"aaa", "zzz"},
-         {"bbb", "yyy"},
-         {"ccc", "xxx"},
-         {"aaa", "zzz"},
+get_keys_01_emulation_test() ->
+    DeepTupleList =
+        [[{"aaa", "zzz"},
          {"bbb", "yyy"},
          {"ccc", "xxx"}],
-    UsortedKeys = proplists:get_keys(TupleList),
-    SortedKeys = lists:sort(UsortedKeys),
-    ?assertEqual(["aaa", "bbb", "ccc"], SortedKeys).
-
-    %?debugFmt("Keys = ~p~n", [Keys]).
+         [{"aaa", "zzz"},
+         {"bbb", "yyy"},
+         {"ccc", "xxx"}]],
+		 
+	FirstList = hd(DeepTupleList),
+    Keys =  lists:map(fun(Elem) -> element(1, Elem) end, FirstList),
+	JoinedList = lists:join(",", Keys),
+    KeysString = lists:flatten(JoinedList),
+    
+    ?assertEqual(["aaa", "bbb", "ccc"], Keys),
+	?assertEqual("aaa,bbb,ccc", KeysString).
 
 get_keys_02_test() ->
-    TupleList =
-        [{"aaa", "zzz"},
-         {"bbb", "yyy"},
-         {"ccc", "xxx"},
-         {"aaa", "zzz"},
+    DeepTupleList =
+        [[{"aaa", "zzz"},
          {"bbb", "yyy"},
          {"ccc", "xxx"}],
-
-    {Keys, _} = get_csv_keys(TupleList),
-    ?assertEqual("aaa,bbb,ccc", Keys).
-
-    %?debugFmt("Keys = ~p~n", [Keys]).
-
-get_values_01_test() ->
-    TupleList =
-        [{"aaa", "zzz"},
+         [{"aaa", "zzz"},
          {"bbb", "yyy"},
-         {"ccc", "xxx"},
-         {"aaa", "zzz"},
+         {"ccc", "xxx"}]],
+
+    KeysString = get_csv_keys(DeepTupleList),
+
+    ?assertEqual("aaa,bbb,ccc", KeysString).
+
+get_values_01_emulation_test() ->
+        DeepTupleList =
+        [[{"aaa", "zzz"},
          {"bbb", "yyy"},
          {"ccc", "xxx"}],
-    {Keys, _} = get_csv_keys(TupleList),
-    AllValuesList =
-        [[[Values] || Values <- proplists:get_all_values(Key, TupleList)]
-         || Key <- Keys],
-    AllValuesList.
-
-    %?debugFmt("AllValuesList = ~p~n", [AllValuesList]).
-
-divide_list_01_test() ->
-    Result = divide_list(1, [1, 1]),
-    ?assertEqual([[1], [1]], Result).
-
-divide_list_02_test() ->
-    Result = divide_list(2, [1, 2, 1, 2]),
-    ?assertEqual([[1, 2], [1, 2]], Result).
-
-divide_list_03_test() ->
-    Result = divide_list(3, [1, 2, 3, 1, 2, 3]),
-    ?assertEqual([[1, 2, 3], [1, 2, 3]], Result).
-
-divide_list_04_test() ->
-    List = ["zzz", "yyy", "xxx", "zzz", "yyy", "xxx"],
-    Result = divide_list(3, List),
-    ?assertEqual([["zzz", "yyy", "xxx"], ["zzz", "yyy", "xxx"]], Result).
+         [{"aaa", "zzz"},
+         {"bbb", "yyy"},
+         {"ccc", "xxx"}]],
+		 
+		ValuesLists = [ lists:map(fun(Elem) -> element(2, Elem) end, TupleList) || TupleList <- DeepTupleList],
+		ValuesList = lists:flatten(ValuesLists),
+		JoinedList = lists:join(",", ValuesList),
+		ValuesString = lists:flatten(JoinedList),
+		?assertEqual("z,z,z,y,y,y,x,x,x,z,z,z,y,y,y,x,x,x",ValuesString).
 
 get_values_02_test() ->
-    TupleList =
-        [{"aaa", "zzz"},
-         {"bbb", "yyy"},
-         {"ccc", "xxx"},
-         {"aaa", "zzz"},
+        DeepTupleList =
+        [[{"aaa", "zzz"},
          {"bbb", "yyy"},
          {"ccc", "xxx"}],
-
-    AllValuesList = lists:map(fun(Tuple) -> element(2, Tuple) end, TupleList),
-    AllEscapedValuesList =
-        lists:map(fun(Value) -> escape(Value) end, AllValuesList),
-    DividedLists = divide_list(3, AllEscapedValuesList),
-    DividedListsWithRowEnd =
-        lists:map(fun(ListItem) ->
-                     JoinedList = lists:join(",", ListItem),
-                     lists:append(JoinedList, "\r\n")
-                  end,
-                  DividedLists),
-
-    OneString = lists:flatten(DividedListsWithRowEnd),
-    ?assertEqual("zzz,yyy,xxx\r\nzzz,yyy,xxx\r\n", OneString).
-
-    %?debugFmt("AllEscapedValuesList = ~p~n", [AllEscapedValuesList]),
-    %?debugFmt("DividedListsWithRowEnd = ~p~n", [DividedListsWithRowEnd]).
-    %?debugFmt("OneString = ~p~n", [OneString]).
-
-get_csv_values_01_test() ->
-    TupleList =
-        [{"aaa", "zzz"},
+         [{"aaa", "zzz"},
          {"bbb", "yyy"},
-         {"ccc", "xxx"},
-         {"aaa", "zzz"},
-         {"bbb", "yyy"},
-         {"ccc", "xxx"}],
-    OneString = get_csv_values(TupleList, 3),
-    ?assertEqual("zzz,yyy,xxx\r\nzzz,yyy,xxx\r\n", OneString).
-
-emulate_encode_01_test() ->
-    TupleList =
-        [{"aaa", "zzz"},
-         {"bbb", "yyy"},
-         {"ccc", "xxx"},
-         {"aaa", "zzz"},
-         {"bbb", "yyy"},
-         {"ccc", "xxx"}],
-
-    {Keys, ColumnCount} = get_csv_keys(TupleList),
-    Values = get_csv_values(TupleList, ColumnCount),
-    Result = lists:flatten([Keys, "\r\n", Values]),
-    %?debugFmt("Ecode = ~p~n", [Result]).
-    ?assertEqual("aaa,bbb,ccc\r\nzzz,yyy,xxx\r\nzzz,yyy,xxx\r\n", Result).
-
-encode_01_test() ->
-    TupleList =
-        [{"aaa", "zzz"},
-         {"bbb", "yyy"},
-         {"ccc", "xxx"},
-         {"aaa", "zzz"},
-         {"bbb", "yyy"},
-         {"ccc", "xxx"}],
-
-    Result = encode(TupleList),
-    %?debugFmt("Ecode = ~p~n", [Result]).
-    ?assertEqual("aaa,bbb,ccc\r\nzzz,yyy,xxx\r\nzzz,yyy,xxx\r\n", Result).
-
-do_escape_01_test() ->
-    String = "b\"\"bb",
-    Result = do_escape(String),
-    ?assertEqual("b\"\"\"\"bb", Result).
+         {"ccc", "xxx"}]],
+		 
+		ValuesString = get_csv_values(DeepTupleList),
+		?assertEqual("z,z,z,y,y,y,x,x,x,z,z,z,y,y,y,x,x,x",ValuesString).
 
 -endif.
