@@ -1,8 +1,8 @@
-decode_row_emulate_1_test() ->
+decode_row_emulate_01_test() ->
     DecodeRow_2 =
         fun Decode_row(String, Acc) ->
                 case decode_field(String) of
-                    {ok, Field, Rest} ->
+                    {go_on, Field, Rest} ->
                         decode_row(Rest, Acc ++ [Field]);
                     {done, Field, Rest} ->
                         Result = Acc ++ [Field],
@@ -16,4 +16,9 @@ decode_row_emulate_1_test() ->
 
     String = "aaa,bbb",
     Result = DecodeRow_1(String),
+    ?assertEqual({["aaa", "bbb"], []}, Result).
+
+decode_row_01_test() ->
+    String = "aaa,bbb",
+    Result = decode_row(String),
     ?assertEqual({["aaa", "bbb"], []}, Result).
