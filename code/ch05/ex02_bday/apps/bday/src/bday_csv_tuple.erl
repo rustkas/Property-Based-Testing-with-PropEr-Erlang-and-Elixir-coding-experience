@@ -40,26 +40,28 @@ divide_list(N, List, Acc) ->
     divide_list(N, NewList, [NewSubList | Acc]).
 
 %% @private return sorted keys
--spec get_csv_keys(DeepTupleList) -> SplitString when
- DeepTupleList :: [[{string(),string()}]],
- SplitString :: string().
+-spec get_csv_keys(DeepTupleList) -> SplitString
+    when DeepTupleList :: [[{string(), string()}]],
+         SplitString :: string().
 get_csv_keys(DeepTupleList) ->
     FirstList = hd(DeepTupleList),
-    Keys =  lists:map(fun(Elem) -> element(1, Elem) end, FirstList),
-	JoinedList = lists:join(",", Keys),
+    Keys = lists:map(fun(Elem) -> element(1, Elem) end, FirstList),
+    JoinedList = lists:join(",", Keys),
     KeysString = lists:flatten(JoinedList),
-	KeysString.
+    KeysString.
 
 %% @private return string of values
--spec get_csv_values(DeepTupleList) -> SplitString when
- DeepTupleList :: [[{string(),string()}]],
- SplitString :: string().
+-spec get_csv_values(DeepTupleList) -> SplitString
+    when DeepTupleList :: [[{string(), string()}]],
+         SplitString :: string().
 get_csv_values(DeepTupleList) ->
-    ValuesLists = [ lists:map(fun(Elem) -> element(2, Elem) end, TupleList) || TupleList <- DeepTupleList],
-		ValuesList = lists:flatten(ValuesLists),
-		JoinedList = lists:join(",", ValuesList),
-		ValuesString = lists:flatten(JoinedList),
-		ValuesString.
+    ListLists =
+        [lists:map(fun(Elem) -> element(2, Elem) end, TupleList)
+         || TupleList <- DeepTupleList],
+    ValuesLists = [lists:join(",", List) || List <- ListLists],
+    JoinedList = lists:join("\r\n", ValuesLists),
+    ValuesString = lists:flatten(JoinedList),
+    ValuesString.
 
 %% @private return a possibly escaped (if necessary) field or name
 -spec escape(string()) -> string().
@@ -168,66 +170,16 @@ decode_quoted([Char | Rest], Acc) ->
 
 -include_lib("eunit/include/eunit.hrl").
 
-
 %%%%%%%%%%%%%%%%
 %%% Encoding %%%
 %%%%%%%%%%%%%%%%
 
-get_keys_01_emulation_test() ->
-    DeepTupleList =
-        [[{"aaa", "zzz"},
-         {"bbb", "yyy"},
-         {"ccc", "xxx"}],
-         [{"aaa", "zzz"},
-         {"bbb", "yyy"},
-         {"ccc", "xxx"}]],
-		 
-	FirstList = hd(DeepTupleList),
-    Keys =  lists:map(fun(Elem) -> element(1, Elem) end, FirstList),
-	JoinedList = lists:join(",", Keys),
-    KeysString = lists:flatten(JoinedList),
-    
-    ?assertEqual(["aaa", "bbb", "ccc"], Keys),
-	?assertEqual("aaa,bbb,ccc", KeysString).
+-include("encode.tests").
 
-get_keys_02_test() ->
-    DeepTupleList =
-        [[{"aaa", "zzz"},
-         {"bbb", "yyy"},
-         {"ccc", "xxx"}],
-         [{"aaa", "zzz"},
-         {"bbb", "yyy"},
-         {"ccc", "xxx"}]],
+%%%%%%%%%%%%%%%%
+%%% Decoding %%%
+%%%%%%%%%%%%%%%%
 
-    KeysString = get_csv_keys(DeepTupleList),
-
-    ?assertEqual("aaa,bbb,ccc", KeysString).
-
-get_values_01_emulation_test() ->
-        DeepTupleList =
-        [[{"aaa", "zzz"},
-         {"bbb", "yyy"},
-         {"ccc", "xxx"}],
-         [{"aaa", "zzz"},
-         {"bbb", "yyy"},
-         {"ccc", "xxx"}]],
-		 
-		ValuesLists = [ lists:map(fun(Elem) -> element(2, Elem) end, TupleList) || TupleList <- DeepTupleList],
-		ValuesList = lists:flatten(ValuesLists),
-		JoinedList = lists:join(",", ValuesList),
-		ValuesString = lists:flatten(JoinedList),
-		?assertEqual("z,z,z,y,y,y,x,x,x,z,z,z,y,y,y,x,x,x",ValuesString).
-
-get_values_02_test() ->
-        DeepTupleList =
-        [[{"aaa", "zzz"},
-         {"bbb", "yyy"},
-         {"ccc", "xxx"}],
-         [{"aaa", "zzz"},
-         {"bbb", "yyy"},
-         {"ccc", "xxx"}]],
-		 
-		ValuesString = get_csv_values(DeepTupleList),
-		?assertEqual("z,z,z,y,y,y,x,x,x,z,z,z,y,y,y,x,x,x",ValuesString).
+-include("decode.tests").
 
 -endif.

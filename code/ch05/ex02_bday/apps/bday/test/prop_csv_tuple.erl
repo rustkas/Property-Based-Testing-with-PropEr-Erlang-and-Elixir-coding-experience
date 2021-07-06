@@ -105,7 +105,7 @@ prop_csv_source() ->
     ?FORALL(DeepList,
             csv_source(),
             begin
-                io:format("~p~n", [DeepList]),			
+                io:format("~p~n", [DeepList]),
                 lists:map(fun(TupleLists) ->
                              lists:map(fun(Tuple) -> is_tuple(Tuple) andalso 2 == tuple_size(Tuple)
                                        end,
@@ -114,9 +114,9 @@ prop_csv_source() ->
                              TupleListLength = length(TupleLists),
                              ColumnCount = length(UsortedKeys),
                              % check all rows have the some size
-							 %io:format("TupleListLength = ~p, ColumnCount = ~p~n",[TupleListLength, ColumnCount]),
+                             %io:format("TupleListLength = ~p, ColumnCount = ~p~n",[TupleListLength, ColumnCount]),
                              %0 = TupleListLength rem ColumnCount,
-							 TupleListLength == ColumnCount
+                             TupleListLength == ColumnCount
                           end,
                           DeepList),
                 true
@@ -130,11 +130,11 @@ prop_roundtrip() ->
     ?FORALL(DeepList,
             csv_source(),
             begin
-                lists:map(fun(TupleLists) -> 
-										EncodingResult = bday_csv_tuple:encode(TupleLists),
-										io:format("~p~n", [EncodingResult]),
-										%bday_csv_tuple:decode(EncodingResult)
-										true
+                lists:map(fun(TupleLists) ->
+                             EncodingResult = bday_csv_tuple:encode(TupleLists),
+                             io:format("~p~n", [EncodingResult]),
+                             %bday_csv_tuple:decode(EncodingResult)
+                             true
                           end,
                           DeepList),
                 true
@@ -194,9 +194,9 @@ entry(Size, KeysGen) ->
          {record(Size), KeysGen},
          begin
              %io:format("Keys = ~p, Vals = ~p~n",[Keys,Vals]),
-			 UniqueKeys = lists:map(fun(Key)-> [string:str(Keys, [Key])] ++ Key end, Keys),
+             UniqueKeys = lists:map(fun(Key) -> [string:str(Keys, [Key])] ++ Key end, Keys),
              %io:format("UniqueKeys = ~p~n",[UniqueKeys]),
-			 lists:zip(UniqueKeys, Vals)
+             lists:zip(UniqueKeys, Vals)
          end).
 
 csv_source() ->
