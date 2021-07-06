@@ -28,17 +28,6 @@ decode(CSV) ->
 %%% PRIVATE %%%
 %%%%%%%%%%%%%%%
 
-%% @private divide list to two
-divide_list(N, List) ->
-    divide_list(N, List, []).
-
-%% @private divide list to two
-divide_list(N, [], Acc) ->
-    Acc;
-divide_list(N, List, Acc) ->
-    {NewSubList, NewList} = lists:split(N, List),
-    divide_list(N, NewList, [NewSubList | Acc]).
-
 %% @private return sorted keys
 -spec get_csv_keys(DeepTupleList) -> SplitString
     when DeepTupleList :: [[{string(), string()}]],
@@ -114,7 +103,7 @@ decode_row(String) ->
 -spec decode_row(string(), [string()]) -> {[string()], string()}.
 decode_row(String, Acc) ->
     case decode_field(String) of
-        {ok, Field, Rest} ->
+        {go_on, Field, Rest} ->
             decode_row(Rest, Acc ++ [Field]);
         {done, Field, Rest} ->
             Result = Acc ++ [Field],
@@ -123,28 +112,10 @@ decode_row(String, Acc) ->
 
 %% @private Decode a field; redirects to decoding quoted or unquoted text
 -spec decode_field(string()) -> {ok | done, string(), string()}.
-decode_field([$" | Rest] = Input) ->
-    decode_quoted(Input);
+decode_field([$" | Rest]) ->
+    decode_quoted(Rest);
 decode_field(String) ->
     decode_unquoted(String).
-
-%% @private Decode an unquoted string
--spec decode_unquoted(string()) -> {ok | done, string(), string()}.
-decode_unquoted(String) ->
-    decode_unquoted(String, []).
-
-%% @private Decode an unquoted string
-% `ok` returns when we have more data at the right
-% `done` returns when we have no data at the right
--spec decode_unquoted(string(), [char()]) -> {ok | done, string(), string()}.
-decode_unquoted([], Acc) ->
-    {done, Acc, ""};
-decode_unquoted([$\r, $\n | Rest], Acc) ->
-    {done, Acc, Rest};
-decode_unquoted([$, | Rest], Acc) ->
-    {ok, Acc, Rest};
-decode_unquoted([Char | Rest], Acc) ->
-    decode_unquoted(Rest, Acc ++ [Char]).
 
 %% @private Decode a quoted string
 -spec decode_quoted(string()) -> {ok | done, string(), string()}.
@@ -153,15 +124,34 @@ decode_quoted(String) ->
 
 -spec decode_quoted(string(), [char()]) -> {ok | done, string(), string()}.
 decode_quoted([$"], Acc) ->
-    {done, Acc ++ [$"], ""};
+    {done, [$"] ++ Acc ++ [$"], ""};
 decode_quoted([$", $\r, $\n | Rest], Acc) ->
-    {done, Acc ++ [$"], Rest};
+    {done, [$"] ++ Acc ++ [$"], Rest};
 decode_quoted([$", $, | Rest], Acc) ->
-    {ok, Acc ++ [$"], Rest};
+    io:format("3-> ~p~n", [Acc]),
+    {go_on, [$"] ++ Acc ++ [$"], Rest};
 decode_quoted([$", $" | Rest], Acc) ->
     decode_quoted(Rest, Acc ++ [$"]);
 decode_quoted([Char | Rest], Acc) ->
     decode_quoted(Rest, Acc ++ [Char]).
+
+%% @private Decode an unquoted string
+-spec decode_unquoted(string()) -> {ok | done, string(), string()}.
+decode_unquoted(String) ->
+    decode_unquoted(String, []).
+
+%% @private Decode an unquoted string
+% `go_on` returns when we have more data at the right
+% `done` returns when we have no data at the right
+-spec decode_unquoted(string(), [char()]) -> {ok | done, string(), string()}.
+decode_unquoted([], Acc) ->
+    {done, Acc, ""};
+decode_unquoted([$\r, $\n | Rest], Acc) ->
+    {done, Acc, Rest};
+decode_unquoted([$, | Rest], Acc) ->
+    {go_on, Acc, Rest};
+decode_unquoted([Char | Rest], Acc) ->
+    decode_unquoted(Rest, Acc ++ [Char]).
 
 %%
 %% Tests
@@ -174,7 +164,7 @@ decode_quoted([Char | Rest], Acc) ->
 %%% Encoding %%%
 %%%%%%%%%%%%%%%%
 
--include("encode.tests").
+%-include("encode.tests").
 
 %%%%%%%%%%%%%%%%
 %%% Decoding %%%

@@ -1,0 +1,23 @@
+decode_unquoted_01_test() ->
+    Result = decode_unquoted(""),
+    ?assertEqual({done, [], []}, Result).
+
+decode_unquoted_02_test() ->
+    Result = decode_unquoted("\r\n"),
+    ?assertEqual({done, [], []}, Result).
+
+decode_unquoted_03_test() ->
+    Result = decode_unquoted(","),
+    ?assertEqual({go_on, [], []}, Result).
+
+decode_unquoted_04_test() ->
+    Result = decode_unquoted(",\r\n"),
+    ?assertEqual({go_on, [], [$\r, $\n]}, Result).
+
+decode_unquoted_05_test() ->
+    Result = decode_unquoted("aaa"),
+    ?assertEqual({done, "aaa", []}, Result).
+
+decode_unquoted_06_test() ->
+    Result = decode_unquoted("aaa,bbb"),
+    ?assertEqual({go_on, "aaa", "bbb"}, Result).

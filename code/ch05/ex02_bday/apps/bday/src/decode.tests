@@ -1,0 +1,4 @@
+%-include("decode_unquoted.tests").
+%-include("decode_quoted.tests").
+-include("decode_field.tests").
+%-include("decode_row.tests").
