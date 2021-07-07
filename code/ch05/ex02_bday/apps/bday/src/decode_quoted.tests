@@ -48,3 +48,8 @@ decode_quoted_10_test() ->
     String = "b\"\"bbb\"",
     Result = decode_quoted(String),
     ?assertEqual({done, "\"b\"bbb\"", ""}, Result).
+
+decode_quoted_11_test() ->
+    String = "abcd\"",
+    Result = decode_quoted(String),
+    ?assertEqual({done, "\"abcd\"", ""}, Result).

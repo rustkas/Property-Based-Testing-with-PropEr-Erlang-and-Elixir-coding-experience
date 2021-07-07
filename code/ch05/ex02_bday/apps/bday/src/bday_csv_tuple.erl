@@ -4,7 +4,10 @@
 
 %% @doc Take a list of maps with the same keys and transform them
 %% into a string that is valid CSV, with a header.
--spec encode([{string(), string()}]) -> string().
+-spec encode([{HeaderItem, DataItem}]) -> CSV when
+   HeaderItem :: string(),
+   DataItem :: string(),
+   CSV :: string().
 encode([]) ->
     "";
 encode(DeepTupleList) ->
@@ -15,14 +18,18 @@ encode(DeepTupleList) ->
 
 %% @doc Take a string that represents a valid CSV data dump
 %% and turn it into a list of maps with the header entries as keys
--spec decode(string()) -> [[{string(), string()}]].
+-spec decode(CSV) -> [[{HeaderItem, DataItem}]] when
+   CSV :: string(),
+   HeaderItem :: string(),
+   DataItem :: string().
 decode("") ->
     [];
 decode(CSV) ->
-    {Headers, Rest} = decode_header(CSV),
+    {Header, Rest} = decode_header(CSV),
     Rows = decode_rows(Rest),
-    ZipList = [lists:zip(Headers, Row) || Row <- Rows],
-    TupleList = lists:flatten(ZipList).
+    ZipList = [lists:zip(Header, Row) || Row <- Rows],
+    Result = ZipList,
+	Result.
 
 %%%%%%%%%%%%%%%
 %%% PRIVATE %%%
@@ -85,13 +92,22 @@ decode_header(String) ->
     decode_row(String).
 
 %% @private Decode all rows into a list.
--spec decode_rows(string()) -> [string()].
+-spec decode_rows(string()) -> [[string()]].
 decode_rows(String) ->
+    decode_rows(String, false).
+
+%% @private Decode all rows into a list.
+-spec decode_rows(string(), boolean()) -> [[string()]].
+decode_rows(String, HasMore) ->
     case decode_row(String) of
         {Row, ""} ->
-            [Row];
+            if HasMore == true ->
+                   Row;
+               HasMore == false ->
+                   [Row]
+            end;
         {Row, Rest} ->
-            [Row | decode_rows(Rest)]
+            [Row, decode_rows(Rest, true)]
     end.
 
 %% @private Decode an entire row, with all values in order

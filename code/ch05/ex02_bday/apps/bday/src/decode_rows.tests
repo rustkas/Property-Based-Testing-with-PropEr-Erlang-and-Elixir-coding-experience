@@ -1,0 +1,88 @@
+decode_rows_01_emulate_test() ->
+    String = "aaa,bbb,ccc",
+    Decode_rowsFun =
+        fun Decode_rows(String, HasMore) ->
+                case decode_row(String) of
+                    {Row, ""} ->
+                        %?debugFmt("Function Result = ~p~n", [Row]),
+                        if HasMore == true ->
+                               Row;
+                           HasMore == false ->
+                               [Row]
+                        end;
+                    {Row, Rest} ->
+                        %?debugFmt("Current Value = ~p~n", [Row]),
+                        [Row, Decode_rows(Rest, true)]
+                end
+        end,
+    Result = Decode_rowsFun(String, false),
+    ?assertEqual([["aaa", "bbb", "ccc"]], Result).
+
+decode_rows_02_emulate_test() ->
+    String = "aaa,bbb,ccc\r\nzzz,yyy,xxx",
+    Decode_rowsFun =
+        fun Decode_rows(String, HasMore) ->
+                case decode_row(String) of
+                    {Row, ""} ->
+                        %?debugFmt("Function Result = ~p~n", [Row]),
+                        if HasMore == true ->
+                               Row;
+                           HasMore == false ->
+                               [Row]
+                        end;
+                    {Row, Rest} ->
+                        %?debugFmt("Current Value = ~p~n", [Row]),
+                        [Row, Decode_rows(Rest, true)]
+                end
+        end,
+    Result = Decode_rowsFun(String, false),
+    ?assertEqual([["aaa", "bbb", "ccc"], ["zzz", "yyy", "xxx"]], Result).
+
+decode_rows_03_emulate_test() ->
+    String = "aaa,bbb",
+    DecodeRows_2 =
+        fun Decode_rows(String, HasMore) ->
+                case decode_row(String) of
+                    {Row, ""} ->
+                        %?debugFmt("Function Result = ~p~n", [Row]),
+                        if HasMore == true ->
+                               Row;
+                           HasMore == false ->
+                               [Row]
+                        end;
+                    {Row, Rest} ->
+                        %?debugFmt("Current Value = ~p~n", [Row]),
+                        [Row, Decode_rows(Rest, true)]
+                end
+        end,
+    DecodeRows_1 = fun(String) -> DecodeRows_2(String, false) end,
+
+    Result = DecodeRows_1(String),
+    ?assertEqual([["aaa", "bbb"]], Result).
+
+decode_rows_01_test() ->
+    String = "aaa,bbb,ccc",
+    Result = decode_rows(String),
+    ?assertEqual([["aaa", "bbb", "ccc"]], Result).
+
+decode_rows_02_test() ->
+    String = "aaa,bbb,ccc\r\nzzz,yyy,xxx",
+    Result = decode_rows(String),
+    ?assertEqual([["aaa", "bbb", "ccc"], ["zzz", "yyy", "xxx"]], Result).
+
+decode_rows_03_test() ->
+    String = "aaa,bbb,ccc\r\nzzz,yyy,xxx",
+    Result = decode_rows(String),
+    ?assertEqual([["aaa", "bbb", "ccc"], ["zzz", "yyy", "xxx"]], Result).
+
+decode_rows_04_test() ->
+    String = "\"aaa\",\"bbb\",\"ccc\"\r\nzzz,yyy,xxx",
+    Result = decode_rows(String),
+    ?assertEqual([["\"aaa\"", "\"bbb\"", "\"ccc\""], ["zzz", "yyy", "xxx"]],
+                 Result).
+
+decode_rows_05_test() ->
+    String = "\"aaa\",\"b\r\nbb\",\"ccc\"\r\nzzz,yyy,xxx",
+    Result = decode_rows(String),
+    ?assertEqual([["\"aaa\"", "\"b\r\nbb\"", "\"ccc\""], ["zzz", "yyy", "xxx"]],
+                 Result).

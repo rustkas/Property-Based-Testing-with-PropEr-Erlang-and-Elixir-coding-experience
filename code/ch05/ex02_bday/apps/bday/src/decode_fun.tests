@@ -1,0 +1,35 @@
+decode_01_emulate_test() ->
+    String = "aaa,bbb,ccc\r\nzzz,yyy,xxx",
+    {Header, Rest} = decode_header(String),
+    Rows = decode_rows(Rest),
+    ZipLists = [lists:zip(Header, Row) || Row <- Rows],
+    %TupleList = lists:flatten(ZipLists),
+    ?assertEqual([[{"aaa", "zzz"}, {"bbb", "yyy"}, {"ccc", "xxx"}]], ZipLists).
+
+decode_02_emulate_test() ->
+    String = "header1,header2,header3\r\naaa,bbb,ccc\r\nzzz,yyy,xxx",
+    {Header, Rest} = decode_header(String),
+    Rows = decode_rows(Rest),
+    ZipLists = [lists:zip(Header, Row) || Row <- Rows],
+
+    ?assertEqual([[{"header1", "aaa"}, {"header2", "bbb"}, {"header3", "ccc"}],
+                  [{"header1", "zzz"}, {"header2", "yyy"}, {"header3", "xxx"}]],
+                 ZipLists).
+
+decode_01_test() ->
+    String = "header1,header2,header3\r\naaa,bbb,ccc\r\nzzz,yyy,xxx",
+    Result = decode(String),
+
+    Expected =
+        [[{"header1", "aaa"}, {"header2", "bbb"}, {"header3", "ccc"}],
+         [{"header1", "zzz"}, {"header2", "yyy"}, {"header3", "xxx"}]],
+    ?assertEqual(Expected, Result).
+
+decode_02_test() ->
+    String = "header1,header1,header2\r\naaa,bbb,ccc\r\nzzz,yyy,xxx",
+    Result = decode(String),
+
+    Expected =
+        [[{"header1", "aaa"}, {"header1", "bbb"}, {"header2", "ccc"}],
+         [{"header1", "zzz"}, {"header1", "yyy"}, {"header2", "xxx"}]],
+    ?assertEqual(Expected, Result).

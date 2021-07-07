@@ -1,4 +1,5 @@
 decode_row_emulate_01_test() ->
+    String = "aaa,bbb",
     DecodeRow_2 =
         fun Decode_row(String, Acc) ->
                 case decode_field(String) of
@@ -13,12 +14,15 @@ decode_row_emulate_01_test() ->
         fun Decode_row(String) ->
                 DecodeRow_2(String, [])
         end,
-
-    String = "aaa,bbb",
     Result = DecodeRow_1(String),
     ?assertEqual({["aaa", "bbb"], []}, Result).
 
 decode_row_01_test() ->
-    String = "aaa,bbb",
+    String = "abc,dfg",
     Result = decode_row(String),
-    ?assertEqual({["aaa", "bbb"], []}, Result).
+    ?assertEqual({["abc", "dfg"], []}, Result).
+
+decode_row_02_test() ->
+    String = "\"nik\",\"plik\"",
+    Result = decode_row(String),
+    ?assertEqual({["\"nik\"", "\"plik\""], []}, Result).
