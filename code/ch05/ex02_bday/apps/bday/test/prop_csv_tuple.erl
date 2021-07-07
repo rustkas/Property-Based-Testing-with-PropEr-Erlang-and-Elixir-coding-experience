@@ -60,7 +60,7 @@ prop_header() ->
 
 prop_record() ->
     ?FORALL(Record,
-            ?SIZED(Size, header(Size + 1)),
+            ?SIZED(Size, record(Size + 1)),
             begin
                 %io:format("~p~n", [Record]),
                 TextData = [$\r, $\n, $", $,] ++ textdata(),
@@ -105,49 +105,23 @@ prop_csv_source() ->
     ?FORALL(DeepList,
             csv_source(),
             begin
-                io:format("~p~n", [DeepList]),
-                lists:map(fun(TupleLists) ->
-                             lists:map(fun(Tuple) -> is_tuple(Tuple) andalso 2 == tuple_size(Tuple)
+                %io:format("~p~n", [DeepList]),
+                lists:all(fun(TupleLists) ->
+				             true = length(TupleLists) >0,
+                             lists:all(fun(Tuple) -> is_tuple(Tuple) andalso 2 == tuple_size(Tuple)
                                        end,
-                                       TupleLists),
-                             UsortedKeys = proplists:get_keys(TupleLists),
-                             TupleListLength = length(TupleLists),
-                             ColumnCount = length(UsortedKeys),
-                             % check all rows have the some size
-                             %io:format("TupleListLength = ~p, ColumnCount = ~p~n",[TupleListLength, ColumnCount]),
-                             %0 = TupleListLength rem ColumnCount,
-                             TupleListLength == ColumnCount
+                                       TupleLists)
                           end,
-                          DeepList),
-                true
+                          DeepList)
             end).
-
-%prop_roundtrip() ->
-%    ?FORALL(Maps, csv_source(),
-%            Maps =:= bday_csv:decode(bday_csv:encode(Maps))).
 
 prop_roundtrip() ->
     ?FORALL(DeepList,
             csv_source(),
             begin
-                lists:map(fun(TupleLists) ->
-                             EncodingResult = bday_csv_tuple:encode(TupleLists),
-                             io:format("~p~n", [EncodingResult]),
-                             %bday_csv_tuple:decode(EncodingResult)
-                             true
-                          end,
-                          DeepList),
-                true
+                EncodingResult = bday_csv_tuple:encode(DeepList),
+                DeepList == bday_csv_tuple:decode(EncodingResult)
             end).
-
-                %io:format("->~p<-~n",[DeepList]),
-
-                                %io:format("->~p<-~n",[TupleLists]),
-
-                %io:format("~p~n", [EncodingResult]),
-                %TupleLists
-                %=:= bday_csv_tuple:decode(
-                %        bday_csv_tuple:encode(TupleLists)),
 
 %%%%%%%%%%%%%%%
 %%% Helpers %%%
@@ -173,7 +147,7 @@ name() ->
     field().
 
 header(Size) ->
-    vector(Size, non_empty(name())).
+    vector(Size, name()).
 
 record(Size) ->
     vector(Size, field()).
@@ -194,9 +168,7 @@ entry(Size, KeysGen) ->
          {record(Size), KeysGen},
          begin
              %io:format("Keys = ~p, Vals = ~p~n",[Keys,Vals]),
-             UniqueKeys = lists:map(fun(Key) -> [string:str(Keys, [Key])] ++ Key end, Keys),
-             %io:format("UniqueKeys = ~p~n",[UniqueKeys]),
-             lists:zip(UniqueKeys, Vals)
+             lists:zip(Keys, Vals)
          end).
 
 csv_source() ->

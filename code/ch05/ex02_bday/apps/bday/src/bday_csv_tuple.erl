@@ -4,10 +4,10 @@
 
 %% @doc Take a list of maps with the same keys and transform them
 %% into a string that is valid CSV, with a header.
--spec encode([{HeaderItem, DataItem}]) -> CSV when
-   HeaderItem :: string(),
-   DataItem :: string(),
-   CSV :: string().
+-spec encode([{HeaderItem, DataItem}]) -> CSV
+    when HeaderItem :: string(),
+         DataItem :: string(),
+         CSV :: string().
 encode([]) ->
     "";
 encode(DeepTupleList) ->
@@ -18,10 +18,10 @@ encode(DeepTupleList) ->
 
 %% @doc Take a string that represents a valid CSV data dump
 %% and turn it into a list of maps with the header entries as keys
--spec decode(CSV) -> [[{HeaderItem, DataItem}]] when
-   CSV :: string(),
-   HeaderItem :: string(),
-   DataItem :: string().
+-spec decode(CSV) -> [[{HeaderItem, DataItem}]]
+    when CSV :: string(),
+         HeaderItem :: string(),
+         DataItem :: string().
 decode("") ->
     [];
 decode(CSV) ->
@@ -29,7 +29,7 @@ decode(CSV) ->
     Rows = decode_rows(Rest),
     ZipList = [lists:zip(Header, Row) || Row <- Rows],
     Result = ZipList,
-	Result.
+    Result.
 
 %%%%%%%%%%%%%%%
 %%% PRIVATE %%%
@@ -128,7 +128,8 @@ decode_row(String, Acc) ->
 
 %% @private Decode a field; redirects to decoding quoted or unquoted text
 -spec decode_field(string()) -> {ok | done, string(), string()}.
-decode_field([$" | Rest]) ->
+decode_field([$" | Rest] = Input) ->
+    %io:format("Input = ~p~n",[Input]),
     decode_quoted(Rest);
 decode_field(String) ->
     decode_unquoted(String).
@@ -180,7 +181,7 @@ decode_unquoted([Char | Rest], Acc) ->
 %%% Encoding %%%
 %%%%%%%%%%%%%%%%
 
-%-include("tests/tuple/encode.tests").
+-include("tests/tuple/encode.tests").
 
 %%%%%%%%%%%%%%%%
 %%% Decoding %%%
