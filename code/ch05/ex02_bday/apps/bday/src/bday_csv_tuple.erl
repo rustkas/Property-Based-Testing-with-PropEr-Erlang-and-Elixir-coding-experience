@@ -180,12 +180,12 @@ decode_unquoted([Char | Rest], Acc) ->
 %%% Encoding %%%
 %%%%%%%%%%%%%%%%
 
-%-include("encode.tests").
+%-include("tests/tuple/encode.tests").
 
 %%%%%%%%%%%%%%%%
 %%% Decoding %%%
 %%%%%%%%%%%%%%%%
 
--include("decode.tests").
+-include("tests/tuple/decode.tests").
 
 -endif.
