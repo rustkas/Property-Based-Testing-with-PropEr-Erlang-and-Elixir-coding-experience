@@ -25,6 +25,8 @@ prop_quotable_text() ->
                 %io:format("~p~n", [Quotable_text]),
                 TextData = [$\r, $\n, $", $,] ++ textdata(),
                 lists:all(fun(Elem) -> string:chr(TextData, Elem) > 0 end, Quotable_text)
+                andalso hd(Quotable_text) =:= $"
+                andalso lists:last(Quotable_text) =:= $"
             end).
 
 prop_field() ->
@@ -107,7 +109,7 @@ prop_csv_source() ->
             begin
                 %io:format("~p~n", [DeepList]),
                 lists:all(fun(TupleLists) ->
-				             true = length(TupleLists) >0,
+                             true = length(TupleLists) > 0,
                              lists:all(fun(Tuple) -> is_tuple(Tuple) andalso 2 == tuple_size(Tuple)
                                        end,
                                        TupleLists)
@@ -119,7 +121,9 @@ prop_roundtrip() ->
     ?FORALL(DeepList,
             csv_source(),
             begin
+                %io:format("DeepList = ~p~n", [DeepList]),
                 EncodingResult = bday_csv_tuple:encode(DeepList),
+                %io:format("Encoded string = ~p~n", [EncodingResult]),
                 DeepList == bday_csv_tuple:decode(EncodingResult)
             end).
 
@@ -138,7 +142,9 @@ unquoted_text() ->
     list(elements(textdata())).
 
 quotable_text() ->
-    list(elements([$\r, $\n, $", $,] ++ textdata())).
+    ?LET(Text,
+         list(elements([$\r, $\n, $", $,] ++ textdata())),
+         [$"] ++ Text ++ [$"]).
 
 field() ->
     oneof([unquoted_text(), quotable_text()]).

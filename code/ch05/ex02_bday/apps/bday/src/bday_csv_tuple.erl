@@ -25,6 +25,7 @@ encode(DeepTupleList) ->
 decode("") ->
     [];
 decode(CSV) ->
+    %io:format("DECODE: ~p~n", [CSV]),
     {Header, Rest} = decode_header(CSV),
     Rows = decode_rows(Rest),
     ZipList = [lists:zip(Header, Row) || Row <- Rows],
@@ -41,7 +42,13 @@ decode(CSV) ->
          SplitString :: string().
 get_csv_keys(DeepTupleList) ->
     FirstList = hd(DeepTupleList),
-    Keys = lists:map(fun(Elem) -> element(1, Elem) end, FirstList),
+    Keys =
+        lists:map(fun(Elem) ->
+                     Key = element(1, Elem),
+                     EscapedKey = escape(Key),
+                     EscapedKey
+                  end,
+                  FirstList),
     JoinedList = lists:join(",", Keys),
     KeysString = lists:flatten(JoinedList),
     KeysString.
@@ -52,7 +59,12 @@ get_csv_keys(DeepTupleList) ->
          SplitString :: string().
 get_csv_values(DeepTupleList) ->
     ListLists =
-        [lists:map(fun(Elem) -> element(2, Elem) end, TupleList)
+        [lists:map(fun(Elem) ->
+                      Value = element(2, Elem),
+                      EscapedValue = escape(Value),
+                      EscapedValue
+                   end,
+                   TupleList)
          || TupleList <- DeepTupleList],
     ValuesLists = [lists:join(",", List) || List <- ListLists],
     JoinedList = lists:join("\r\n", ValuesLists),
@@ -61,30 +73,18 @@ get_csv_values(DeepTupleList) ->
 
 %% @private return a possibly escaped (if necessary) field or name
 -spec escape(string()) -> string().
+escape([$", Field, $"] = Input) ->
+	
+    SearchPattern = [$"],
+    case string:find(Field, SearchPattern) of
+        nomatch ->
+            Input;
+        _ ->
+            EscapedField = string:replace([Field], SearchPattern, [$", $"], all),
+            [$", EscapedField, $"]
+    end;
 escape(Field) ->
-    case escapable(Field) of
-        true ->
-            "\"" ++ do_escape(Field) ++ "\"";
-        false ->
-            Field
-    end.
-
-%% @private checks whether a string for a field or name needs escaping
--spec escapable(string()) -> boolean().
-escapable(String) ->
-    lists:any(fun(Char) -> lists:member(Char, [$", $,, $\r, $\n]) end, String).
-
-%% @private replace escapable characters (only `"') in CSV.
-%% The surrounding double-quotes are not added; caller must add them.
--spec do_escape(string()) -> string().
-do_escape([]) ->
-    [];
-do_escape([$", $" | Str]) ->
-    [$", $", $", $" | do_escape(Str)];
-do_escape([$" | Str]) ->
-    [$", $" | do_escape(Str)];
-do_escape([Char | Rest]) ->
-    [Char | do_escape(Rest)].
+    Field.
 
 %% @private Decode the entire header line, returning all names in order
 -spec decode_header(string()) -> {[string()], string()}.
@@ -128,8 +128,8 @@ decode_row(String, Acc) ->
 
 %% @private Decode a field; redirects to decoding quoted or unquoted text
 -spec decode_field(string()) -> {ok | done, string(), string()}.
-decode_field([$" | Rest] = Input) ->
-    %io:format("Input = ~p~n",[Input]),
+decode_field([$" | Rest] = _Input) ->
+    %io:format("Input = ~p~n",[_Input]),
     decode_quoted(Rest);
 decode_field(String) ->
     decode_unquoted(String).
@@ -145,7 +145,6 @@ decode_quoted([$"], Acc) ->
 decode_quoted([$", $\r, $\n | Rest], Acc) ->
     {done, [$"] ++ Acc ++ [$"], Rest};
 decode_quoted([$", $, | Rest], Acc) ->
-    io:format("3-> ~p~n", [Acc]),
     {go_on, [$"] ++ Acc ++ [$"], Rest};
 decode_quoted([$", $" | Rest], Acc) ->
     decode_quoted(Rest, Acc ++ [$"]);
@@ -187,6 +186,6 @@ decode_unquoted([Char | Rest], Acc) ->
 %%% Decoding %%%
 %%%%%%%%%%%%%%%%
 
--include("tests/tuple/decode.tests").
+%-include("tests/tuple/decode.tests").
 
 -endif.

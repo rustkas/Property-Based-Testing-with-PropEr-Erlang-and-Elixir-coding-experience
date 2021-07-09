@@ -1,11 +1,13 @@
 decode_header_emulate_01_test() ->
+    Expected = ["aaa", "bbb", "ccc"],
     String = "aaa,bbb,ccc\r\nzzz,yyy,xxx",
     Result = decode_row(String),
     {Header, _} = Result,
-    ?assertEqual(["aaa", "bbb", "ccc"], Header).
+    ?assertEqual(Expected, Header).
 
 decode_header_01_test() ->
+    Expected = ["aaa", "bbb", "ccc"],
     String = "aaa,bbb,ccc\r\nzzz,yyy,xxx",
     Result = decode_header(String),
     {Header, _} = Result,
-    ?assertEqual(["aaa", "bbb", "ccc"], Header).
+    ?assertEqual(Expected, Header).

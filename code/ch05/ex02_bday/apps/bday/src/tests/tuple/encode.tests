@@ -1,1 +1,3 @@
--include("encode_get_keys.tests").
+%-include("encode_get_keys.tests").
+%-include("encode_get_values.tests").
+-include("encode_escape.tests").

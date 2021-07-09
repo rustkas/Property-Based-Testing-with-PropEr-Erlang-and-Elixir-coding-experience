@@ -1,10 +1,11 @@
 decode_row_emulate_01_test() ->
+    Expected = {["aaa", "bbb"], []},
     String = "aaa,bbb",
     DecodeRow_2 =
         fun Decode_row(String, Acc) ->
                 case decode_field(String) of
                     {go_on, Field, Rest} ->
-                        decode_row(Rest, Acc ++ [Field]);
+                        Decode_row(Rest, Acc ++ [Field]);
                     {done, Field, Rest} ->
                         Result = Acc ++ [Field],
                         {Result, Rest}
@@ -15,14 +16,16 @@ decode_row_emulate_01_test() ->
                 DecodeRow_2(String, [])
         end,
     Result = DecodeRow_1(String),
-    ?assertEqual({["aaa", "bbb"], []}, Result).
+    ?assertEqual(Expected, Result).
 
 decode_row_01_test() ->
+    Expected = {["abc", "dfg"], []},
     String = "abc,dfg",
     Result = decode_row(String),
-    ?assertEqual({["abc", "dfg"], []}, Result).
+    ?assertEqual(Expected, Result).
 
 decode_row_02_test() ->
+    Expected = {["\"nik\"", "\"plik\""], []},
     String = "\"nik\",\"plik\"",
     Result = decode_row(String),
-    ?assertEqual({["\"nik\"", "\"plik\""], []}, Result).
+    ?assertEqual(Expected, Result).

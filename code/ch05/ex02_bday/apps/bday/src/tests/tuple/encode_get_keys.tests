@@ -1,4 +1,5 @@
 get_keys_01_emulation_test() ->
+    Expected = "aaa,bbb,ccc",
     DeepTupleList =
         [[{"aaa", "zzz"}, {"bbb", "yyy"}, {"ccc", "xxx"}],
          [{"aaa", "zzz"}, {"bbb", "yyy"}, {"ccc", "xxx"}]],
@@ -9,41 +10,47 @@ get_keys_01_emulation_test() ->
     KeysString = lists:flatten(JoinedList),
 
     ?assertEqual(["aaa", "bbb", "ccc"], Keys),
-    ?assertEqual("aaa,bbb,ccc", KeysString).
+    ?assertEqual(Expected, KeysString).
 
 get_keys_02_test() ->
+    Expected = "aaa,bbb,ccc",
     DeepTupleList =
         [[{"aaa", "zzz"}, {"bbb", "yyy"}, {"ccc", "xxx"}],
          [{"aaa", "zzz"}, {"bbb", "yyy"}, {"ccc", "xxx"}]],
 
     KeysString = get_csv_keys(DeepTupleList),
 
-    ?assertEqual("aaa,bbb,ccc", KeysString).
+    ?assertEqual(Expected, KeysString).
 
 get_keys_03_test() ->
+    Expected = "B,A",
     DeepTupleList = [[{"B", []}, {"A", []}]],
     KeysString = get_csv_keys(DeepTupleList),
-    ?assertEqual("B,A", KeysString).
+    ?assertEqual(Expected, KeysString).
 
 get_keys_04_test() ->
+    Expected = "A,0",
     DeepTupleList = [[{"A", "v"}, {"0", "^"}]],
     KeysString = get_csv_keys(DeepTupleList),
-    ?assertEqual("A,0", KeysString).
+    ?assertEqual(Expected, KeysString).
 
 get_keys_05_test() ->
+    Expected = "A,C",
     DeepTupleList = [[{"A", []}, {"C", "N"}]],
     KeysString = get_csv_keys(DeepTupleList),
-    ?assertEqual("A,C", KeysString).
+    ?assertEqual(Expected, KeysString).
 
 get_keys_06_test() ->
+    Expected = "A,C",
     DeepTupleList = [[{[65], []}, {[67], []}]],
     KeysString = get_csv_keys(DeepTupleList),
-    ?assertEqual("A,C", KeysString).
+    ?assertEqual(Expected, KeysString).
 
 get_keys_07_test() ->
+    Expected = "B,A",
     DeepTupleList = [[{[66], []}, {[65], []}]],
     KeysString = get_csv_keys(DeepTupleList),
-    ?assertEqual("B,A", KeysString).
+    ?assertEqual(Expected, KeysString).
 
 get_keys_08_test() ->
     DeepTupleList =
@@ -74,5 +81,10 @@ get_keys_10_test() ->
          [{",nEj/TZ", "(J#Nk\nU"}, {[], []}],
          [{",nEj/TZ", []}, {[], "[V6| F\\%"}],
          [{",nEj/TZ", []}, {[], "I"}]],
+    KeysString = get_csv_keys(DeepTupleList),
+    ?assert(is_list(KeysString)).
+
+get_keys_11_test() ->
+    DeepTupleList = [[{[], []}, {[], [34]}]],
     KeysString = get_csv_keys(DeepTupleList),
     ?assert(is_list(KeysString)).

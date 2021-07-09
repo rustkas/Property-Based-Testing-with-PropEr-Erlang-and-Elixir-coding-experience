@@ -33,7 +33,7 @@ Proper
 	$ rebar3 proper -d apps/bday/test -m prop_csv_tuple -p prop_record -n 1000
 	$ rebar3 proper -d apps/bday/test -m prop_csv_tuple -p prop_entry -n 1000
 	$ rebar3 proper -d apps/bday/test -m prop_csv_tuple -p prop_csv_source -n 1
-	$ rebar3 proper -d apps/bday/test -m prop_csv_tuple -p prop_roundtrip -n 1000
+	$ rebar3 proper -d apps/bday/test -m prop_csv_tuple -p prop_roundtrip -n 2
 	
 Run PropEr generators
 -----

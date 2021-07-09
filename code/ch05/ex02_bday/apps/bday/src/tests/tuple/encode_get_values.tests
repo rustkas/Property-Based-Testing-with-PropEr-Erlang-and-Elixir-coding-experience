@@ -1,4 +1,5 @@
 get_values_01_emulation_test() ->
+    Expected = "zzz,yyy,xxx\r\nzzz,yyy,xxx",
     DeepTupleList =
         [[{"aaa", "zzz"}, {"bbb", "yyy"}, {"ccc", "xxx"}],
          [{"aaa", "zzz"}, {"bbb", "yyy"}, {"ccc", "xxx"}]],
@@ -9,17 +10,19 @@ get_values_01_emulation_test() ->
     ValuesLists = [lists:join(",", List) || List <- ListLists],
     JoinedList = lists:join("\r\n", ValuesLists),
     ValuesString = lists:flatten(JoinedList),
-    ?assertEqual("zzz,yyy,xxx\r\nzzz,yyy,xxx", ValuesString).
+    ?assertEqual(Expected, ValuesString).
 
 get_values_02_test() ->
+    Expected = "zzz,yyy,xxx\r\nzzz,yyy,xxx",
     DeepTupleList =
         [[{"aaa", "zzz"}, {"bbb", "yyy"}, {"ccc", "xxx"}],
          [{"aaa", "zzz"}, {"bbb", "yyy"}, {"ccc", "xxx"}]],
 
     ValuesString = get_csv_values(DeepTupleList),
-    ?assertEqual("zzz,yyy,xxx\r\nzzz,yyy,xxx", ValuesString).
+    ?assertEqual(Expected, ValuesString).
 
 encode_01_emulate_test() ->
+    Expected = "aaa,bbb,ccc\r\nzzz,yyy,xxx\r\nzzz,yyy,xxx",
     DeepTupleList =
         [[{"aaa", "zzz"}, {"bbb", "yyy"}, {"ccc", "xxx"}],
          [{"aaa", "zzz"}, {"bbb", "yyy"}, {"ccc", "xxx"}]],
@@ -27,12 +30,4 @@ encode_01_emulate_test() ->
     KeysString = get_csv_keys(DeepTupleList),
     ValuesString = get_csv_values(DeepTupleList),
     Result = lists:flatten([KeysString, "\r\n", ValuesString]),
-    ?assertEqual("aaa,bbb,ccc\r\nzzz,yyy,xxx\r\nzzz,yyy,xxx", Result).
-
-encode_02_test() ->
-    DeepTupleList =
-        [[{"aaa", "zzz"}, {"bbb", "yyy"}, {"ccc", "xxx"}],
-         [{"aaa", "zzz"}, {"bbb", "yyy"}, {"ccc", "xxx"}]],
-
-    Result = encode(DeepTupleList),
-    ?assertEqual("aaa,bbb,ccc\r\nzzz,yyy,xxx\r\nzzz,yyy,xxx", Result).
+    ?assertEqual(Expected, Result).
