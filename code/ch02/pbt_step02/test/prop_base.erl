@@ -1,7 +1,7 @@
 -module(prop_base).
 
 -include_lib("proper/include/proper.hrl").
-
+-import(base,[biggest/1]).
 %%%%%%%%%%%%%%%%%%
 %%% Properties %%%
 %%%%%%%%%%%%%%%%%%
@@ -19,9 +19,7 @@ prop_biggest() ->
 %%%%%%%%%%%%%%%
 boolean(_) -> true.
 
-biggest([Head | _Tail]) -> Head.
-
 %%%%%%%%%%%%%%%%%%
 %%% Generators %%%
 %%%%%%%%%%%%%%%%%%
-mytype() -> term().
+%mytype() -> term().

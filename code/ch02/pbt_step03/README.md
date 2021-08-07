@@ -25,7 +25,7 @@ Create new propety via PropEr
 
 PropEr test
 -----
-    $ rebar3 proper
+    $ rebar3 proper --long_result
 
 
 PropEr test (make 10_000 tests)

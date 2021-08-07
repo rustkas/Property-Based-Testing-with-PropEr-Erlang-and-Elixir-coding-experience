@@ -15,15 +15,17 @@ prop_a_sample() ->
 %%%%%%%%%%%%%%%
 %%% Helpers %%%
 %%%%%%%%%%%%%%%
-increments([Head | Tail]) -> increments(Head, Tail).
+increments([Head | Tail]) -> 
+  io:format("["),
+  increments(Head, Tail).
 
 increments(_, []) ->
     io:format("~n"),
     true;
 increments(N, [Head | Tail]) when Head == N + 1 ->
-    io:format("~p", [Head]),
+    io:format("~B", [Head]),
     if length(Tail) > 0 -> io:format(", ");
-       true -> io:format("|")
+       true -> io:format("]")
     end,
     increments(Head, Tail);
 increments(_, _) -> false.

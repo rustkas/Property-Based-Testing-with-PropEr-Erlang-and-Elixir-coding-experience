@@ -74,7 +74,6 @@ get_csv_values(DeepTupleList) ->
 %% @private return a possibly escaped (if necessary) field or name
 -spec escape(string()) -> string().
 escape([$", Field, $"] = Input) ->
-	
     SearchPattern = [$"],
     case string:find(Field, SearchPattern) of
         nomatch ->

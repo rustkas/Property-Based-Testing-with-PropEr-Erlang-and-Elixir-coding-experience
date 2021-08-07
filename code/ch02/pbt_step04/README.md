@@ -28,3 +28,8 @@ PropEr test
 PropEr test (make 10_000 tests)
 -----	
 	$ rebar3 proper -n 10000
+
+## EUnit
+-----
+	$ rebar3 eunit
+	$ rebar3 eunit -m base_test	

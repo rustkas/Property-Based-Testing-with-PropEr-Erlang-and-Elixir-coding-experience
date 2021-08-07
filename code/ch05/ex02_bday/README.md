@@ -62,11 +62,6 @@ Build
 -----
 	$ rebar3 compile
 
-Run
------
-	$ rebar3 eunit -v --app bday
-
-
 	
 Format
 -----
