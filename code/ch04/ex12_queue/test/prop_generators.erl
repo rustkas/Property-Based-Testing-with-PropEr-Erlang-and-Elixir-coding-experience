@@ -16,8 +16,8 @@ prop_queue_naive() ->
 prop_queue_nicer() ->
     ?FORALL(Q, queue(), queue:is_queue(Q)).
 
-%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%
 %%% Generators %%%
-%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%
 queue() ->
     ?LET(List, list({term(), term()}), queue:from_list(List)).

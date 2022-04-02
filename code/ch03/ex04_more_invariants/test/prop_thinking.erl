@@ -29,7 +29,8 @@ prop_sort() ->
 prop_same_size() ->
     ?FORALL(L, (list(number())),
             begin
-                Sorted = lists:sort(L), length(L) =:= length(Sorted)
+                Sorted = lists:sort(L), 
+				length(L) =:= length(Sorted)
             end).
 
 %% @doc any element in the sorted list has to have its equivalent in

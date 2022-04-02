@@ -34,3 +34,13 @@ Format
 PropEr test
 -----
     $ rebar3 proper
+
+Launch test shell
+-----
+
+$ rebar3 as test shell
+
+```
+proper_gen:sample(proper_types:list({prop_generators:key(),prop_generators:val()})).
+
+```

@@ -31,4 +31,6 @@ Format
 PropEr test
 -----
     $ rebar3 proper
+	$ rebar3 proper -m prop_generators -p prop_queue_naive
+	$ rebar3 proper -m prop_generators -p prop_queue_nicer
 	

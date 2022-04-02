@@ -26,14 +26,21 @@ Proper
 	
 	
 	$ rebar3 proper -d apps/bday/test -m prop_csv_tuple -p prop_unquoted_text -n 1000
-	$ rebar3 proper -d apps/bday/test -m prop_csv_tuple -p prop_quotable_text -n 1000
+	
 	$ rebar3 proper -d apps/bday/test -m prop_csv_tuple -p prop_field -n 1000
 	$ rebar3 proper -d apps/bday/test -m prop_csv_tuple -p prop_name -n 1000
 	$ rebar3 proper -d apps/bday/test -m prop_csv_tuple -p prop_header -n 1000
 	$ rebar3 proper -d apps/bday/test -m prop_csv_tuple -p prop_record -n 1000
 	$ rebar3 proper -d apps/bday/test -m prop_csv_tuple -p prop_entry -n 1000
 	$ rebar3 proper -d apps/bday/test -m prop_csv_tuple -p prop_csv_source -n 1
-	$ rebar3 proper -d apps/bday/test -m prop_csv_tuple -p prop_roundtrip -n 2
+	
+	$ ==> useless <== rebar3 proper -d apps/bday/test -m prop_csv_tuple_regex -p prop_roundtrip -n 2
+	
+	
+	$ rebar3 proper -d apps/bday/test -m prop_csv_tuple_regex -p prop_quotable_text -n 1000
+	$ rebar3 proper -d apps/bday/test -m prop_csv_tuple_regex -p prop_roundtrip -n 2
+	$ rebar3 proper -d apps/bday/test -m prop_csv_tuple_regex -p prop_encode_roundtrip -n 2
+	
 	
 Run PropEr generators
 -----
@@ -54,9 +61,13 @@ Run PropEr generators
 
 EUnit
 -----
-	$ rebar3 eunit -v -m bday_csv_tuple
-	$ rebar3 eunit -v -m rfc_tuple_tests
-	$ rebar3 eunit -v -m rfc_tuple_encode_tests
+	$ rebar3 eunit -m bday_csv_tuple
+	$ rebar3 eunit -m rfc_tuple_tests
+	$ rebar3 eunit -m rfc_tuple_regex_tests
+	$ rebar3 eunit -m split_test
+	$ rebar3 eunit -m shrink_tests
+	
+	$ rebar3 compile && rebar3 eunit -m bday_csv_tuple_regex
 
 Build
 -----

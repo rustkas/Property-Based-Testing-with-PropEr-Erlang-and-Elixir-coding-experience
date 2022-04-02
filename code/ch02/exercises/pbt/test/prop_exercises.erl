@@ -24,8 +24,9 @@ increments(_, []) ->
     true;
 increments(N, [Head | Tail]) when Head == N + 1 ->
     io:format("~B", [Head]),
-    if length(Tail) > 0 -> io:format(", ");
-       true -> io:format("]")
+    case length(Tail) > 0 of 
+		true -> io:format(", ");
+        false -> io:format("]")
     end,
     increments(Head, Tail);
 increments(_, _) -> false.

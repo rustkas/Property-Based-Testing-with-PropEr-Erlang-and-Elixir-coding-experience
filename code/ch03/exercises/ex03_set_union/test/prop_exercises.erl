@@ -5,6 +5,8 @@
 %%%%%%%%%%%%%%%%%%
 %%% Properties %%%
 %%%%%%%%%%%%%%%%%%
+
+%% with error
 prop_set_union() ->
     ?FORALL({ListA, ListB},
             {list(number()), list(number())},

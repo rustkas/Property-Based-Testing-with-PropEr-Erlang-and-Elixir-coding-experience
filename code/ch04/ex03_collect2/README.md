@@ -34,3 +34,5 @@ Format
 PropEr test
 -----
     $ rebar3 proper
+	
+	$ rebar3 get-deps && rebar3 proper

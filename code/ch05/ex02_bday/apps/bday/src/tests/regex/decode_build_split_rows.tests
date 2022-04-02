@@ -1,0 +1,61 @@
+result_01_test0()->
+	Expected = ["\",\r\n,\""],
+    Text = "\",\r\n,\"\r\n\"",
+	
+	TunedText = tune_string(Text),
+	%?debugFmt("TunedText = ~p~n",[TunedText]),
+	SplittedText = split_text(TunedText),
+	%?debugFmt("SplittedText = ~p~n",[SplittedText]),
+	HeaderString = get_header_string(SplittedText),
+	%?debugFmt("HeaderString = ~p~n",[HeaderString]),
+	SplitMP = build_split_rows_mp(),
+	HeaderList = split_row(HeaderString,SplitMP),
+	%?debugFmt("HeaderList = ~p~n",[HeaderList]),
+	Result = HeaderList,
+	%?assertEqual(Expected, Result).
+	ok.
+	
+	result_02_test0()->
+	
+	Expected = ["a","b"],
+	Text = "a,b\r\n\c,d",
+	
+	TunedText = tune_string(Text),
+	%?debugFmt("TunedText = ~p~n",[TunedText]),
+	
+	SplittedText = split_text(TunedText),
+	%?debugFmt("SplittedText = ~p~n",[SplittedText]),
+	
+	HeaderString = get_header_string(SplittedText),
+	%?debugFmt("HeaderString = ~p~n",[HeaderString]),
+	
+	SplitMP = build_split_rows_mp(),
+	HeaderList = split_row(HeaderString,SplitMP),
+	%?debugFmt("HeaderList = ~p~n",[HeaderList]),
+	
+	Result = HeaderList,
+	?assertEqual(Expected, Result).
+	
+	result_03_test()->
+	
+	Expected = ["\"aaa\"","\"b\"bb\"","\"ccc\""],
+	Text = "\"aaa\",\"b\"\"bb\",\"ccc\"\r\n,,",
+	
+	TunedText = tune_string(Text),
+	%?debugFmt("TunedText = ~p~n",[TunedText]),
+	
+	SplittedText = split_text(TunedText),
+	%?debugFmt("SplittedText = ~p~n",[SplittedText]),
+	
+	HeaderString = get_header_string(SplittedText),
+	%?debugFmt("HeaderString = ~p~n",[HeaderString]),
+	
+	SplitMP = build_split_rows_mp(),
+	HeaderList = split_row(HeaderString,SplitMP),
+	%?debugFmt("HeaderList = ~p~n",[HeaderList]),
+	
+	Result = HeaderList,
+	?assertEqual(Expected, Result).	
+	
+
+	

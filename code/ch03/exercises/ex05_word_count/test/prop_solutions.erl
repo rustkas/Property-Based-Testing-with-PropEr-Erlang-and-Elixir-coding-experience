@@ -7,7 +7,7 @@
 %%%%%%%%%%%%%%%%%%
 prop_word_count() ->
     ?FORALL(String, (non_empty(string())),
-            (word_count(String) =:= alt_word_count(String))).
+            (solutions:word_count(String) =:= alt_word_count(String))).
 
 alt_word_count(String) -> space(String).
 

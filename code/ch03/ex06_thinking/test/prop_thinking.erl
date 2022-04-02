@@ -19,38 +19,38 @@ prop_last() ->
         end).
 
 prop_sort() ->
-        ?FORALL(List, list(term()),
-            is_ordered(lists:sort(List))).
+	?FORALL(List, list(term()),
+		is_ordered(lists:sort(List))).
 
 %% @doc the sorted and unsorted list should both remain the same size
 prop_same_size() ->
-         ?FORALL(L, list(number()),
-            length(L) =:= length(lists:sort(L))).
+	?FORALL(L, list(number()),
+		length(L) =:= length(lists:sort(L))).
 
 %% @doc any element in the sorted list has to have its equivalent in
 %% the unsorted list
 prop_no_added() ->
-       ?FORALL(L, list(number()),
-           begin
-               Sorted = lists:sort(L),
-               lists:all(fun(Element) -> lists:member(Element, L) end, Sorted)
-           end).
+	?FORALL(L, list(number()),
+	   begin
+		   Sorted = lists:sort(L),
+		   lists:all(fun(Element) -> lists:member(Element, L) end, Sorted)
+	   end).
 
 %% @doc any element in the unsorted list has to have its equivalent in
 %% the sorted list
 prop_no_removed() ->
-                  ?FORALL(L, list(number()),
-            begin
-               Sorted = lists:sort(L),
-               lists:all(fun(Element) -> lists:member(Element, Sorted) end, L)
-            end).
+	?FORALL(L, list(number()),
+	begin
+	   Sorted = lists:sort(L),
+	   lists:all(fun(Element) -> lists:member(Element, Sorted) end, L)
+	end).
 
 prop_symmetric() ->
-                ?FORALL(Data, list({atom(), any()}),
-            begin
-               Encoded = encode(Data), 
-               erlang:is_binary(Encoded) andalso Data =:= decode(Encoded)
-            end).
+	?FORALL(Data, list({atom(), any()}),
+		begin
+		   Encoded = encode(Data), 
+		   erlang:is_binary(Encoded) andalso Data =:= decode(Encoded)
+		end).
 
 
 %%%%%%%%%%%%%%%

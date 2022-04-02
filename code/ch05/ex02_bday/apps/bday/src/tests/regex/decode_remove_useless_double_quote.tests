@@ -1,0 +1,7 @@
+remove_useless_double_quote_01_test()->
+    Expected = ["aaa","b\r\nbb","ccc"],
+	RemoveUselessDoubleQuoteMP = build_remove_double_quote_mp(),
+    StringList = ["\"aaa\"", "\"b\r\nbb\"","\"ccc\""],
+    Result = remove_useless_double_quote(RemoveUselessDoubleQuoteMP, StringList),
+    ?assertEqual(Expected, Result).
+

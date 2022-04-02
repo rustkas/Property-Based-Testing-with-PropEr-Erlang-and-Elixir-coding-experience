@@ -1,0 +1,6 @@
+decode_tune_string_01_test() ->
+    Expected = "a",
+	Text = "a\r\n",
+	%?debugFmt("~p~n",[Text]),
+    Result = tune_string(Text),
+    ?assertEqual(Expected, Result).

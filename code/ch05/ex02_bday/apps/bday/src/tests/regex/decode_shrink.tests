@@ -1,0 +1,33 @@
+shrink_01_01_test0()->
+	%Expected = ["aaa","b\"bb","ccc"],
+    
+    Text =
+"\":qdU<K\nxpJo2tv)M'!WrKYfZ;Cx\",#Ki{+F+LiU=M-,2kCeF~aN(j42s/ZNu72.^G9fRXNg?/lD8HI|`]?/,9yx;IbsZA!i{[,\"p1*Y/b'C{t>Peq!2}c-4o5PDi\r1\n@l7{!!I#\",z5L{,!^],67V<D?`lz,u4bH[<cGasBC3d82;tTPE=-;E;82Hej< G9I>\r\npa[cK<P{4F#{}&pk7e]=\\dEEgIm,+{M,B400ZYfh9/#Ts^4.k#9,y#$--,&==~cY'V[,PDKMP7eF78mci>HO#8<(<1Onl_>xktJkTMtj!w,yD:8ht1,\"c8?15B5+\"\"`(kN+V+HkSYq^:\",]Y;aL@A<UATo;&a!LC0~nZYW6#tl=|wo*W\r\n)aS,{POGeBv*Qj;!IHx2FL?EGW9<QOjf>i!Zp$VeEw^Z,\"7G2j$\ny}plqE2S$ONog[/' 4[)LP?<<G\",~2AGq4Gv&C0Hm\\,K5h.;YzY_QF!v,cx`L}XM_|uX84oq2KS+\\^YguSg]zNSAh9qz'[dj,qT83C%#ihi82U#h,Vb$DHm;Vdb>-r{ToN,\"1#6o57.`:8\nuy>24O T;#ma'\"\r\nd:,Os7l`/}4`t8,XPTh?\\+c{XbdLUR}8{(}JS@1:(;7_EN3(uf7R`N?@m,\"v%j07/:;eZn[Fo\n@Bif+Y\"\"x=z?]UROR\",*AeN9A$qKrS@hyhy0Sb0.GXGju,,b4oyEx,oEdW8#jSf]pbQsLq^jSNV`1qJVg78~;'9pJi,DX11~ZitaQ!jdfkZQp'D-Y H@cz\r\n\"\\X84~GlJ>\\|/5\n\n)[\",9F]s(G.l'~q75Go#e83@,qNT,\"5Rgw3v >+<la7@:.P?AjHT?~!2=}B:o4QM:4\"\"&qXy\",\"F}h#W#KOWae936B-!GL+ix//Me`)ZsQ%!}:g\\4:\n~\",ik,\"W AysSS7,xL-boiX f\r\\^b|IxPe$,'@.tB+1\",'^EVmA7> 0'0c*SU+jH%h}7,KIWHK0Hl|sXt;E**!Pr$CEu2lTE5)z3625h[S'k\r\n!]!:MoUH<FV@@,L\\,+>hd~fvI.2OT[e5nNSBG`(nUj,o8k2PMlid_C%o`]wHT,dV/U]mx?%N5xC.vX,X9xLTP=BpWO_j?civZcv(z^'i}i&+zAlbn<*XTQGX,,J9+],#m1Mi9$*Y''M^ikwSBVu v.kz;br$d&HdmqF9[M\r\n\"z)}tg^Sl,#c:Z#}fcfO~euHT\",v<Sy_g97< N9b~9*IP`d|O,1\\1~C97b~8Q.+D<L,43,#Ead6<W,%S82,Kc[55,{kVZ/Am{3,{.bg2S`vAN}^~]^vgZ12",
+
+	{HeaderList,DataList} = get_info(Text),
+	?debugFmt("Header Length = ~p~n",[length(HeaderList)]),
+	?debugFmt("Data Length = ~p~n",[length(DataList)]).
+	%Result = HeaderList,
+	%?assertEqual(Expected, Result).
+	
+shrink_02_test()->
+	%Expected = ["aaa","b\"bb","ccc"],
+	    Text = ",\r\n,t",
+		{HeaderList,DataList} = get_info(Text),
+	    ?debugFmt("Header Length = ~p~n",[length(HeaderList)]),
+	    ?debugFmt("Data Length = ~p~n",[length(DataList)]).
+	
+% Helper	
+get_info(Text)->
+TunedText = tune_string(Text),
+	SplittedText = split_text(TunedText),
+	?debugFmt("SplittedText = ~p~n",[SplittedText]),
+	SplitMP = build_split_rows_mp(),
+	RemoveUselessDoubleQuoteMP = build_remove_double_quote_mp(),
+	
+    HeaderList = get_header(SplittedText,SplitMP,RemoveUselessDoubleQuoteMP),
+	DataList =     get_data(SplittedText,SplitMP,RemoveUselessDoubleQuoteMP),
+	{HeaderList,DataList}.	
+	
+
+	

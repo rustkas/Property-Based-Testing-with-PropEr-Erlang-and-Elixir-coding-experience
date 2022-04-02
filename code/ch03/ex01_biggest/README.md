@@ -24,6 +24,10 @@ Create new propety via PropEr
 	$ rebar3 proper -p prop_biggest
 	$ rebar3 eunit
 
+EUnit tests
+-----
+    $ rebar3 eunit -v
+
 PropEr test
 -----
     $ rebar3 proper
