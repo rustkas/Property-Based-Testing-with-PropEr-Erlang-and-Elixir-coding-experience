@@ -11,7 +11,7 @@ prop_dupes() ->
                 M = maps:from_list(KV),
 				% if you would like to see 
 				% what {key,value} contains,
-				% please, uncommet next log block
+				% please, uncomment next log block
 				% io:format("~n---------~n"),
 				% lists:foreach(fun({K, V}) ->
 				%                io:format("{Key = ~p, Value = ~p}",[K,V]) end, KV),

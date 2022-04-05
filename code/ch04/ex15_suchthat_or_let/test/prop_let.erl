@@ -32,11 +32,12 @@ prop_uneven() ->
 %%%%%%%%%%%%%%%
 %%% Helpers %%%
 %%%%%%%%%%%%%%%
-even() -> ?LET(N, integer(), N*2).
-uneven() -> ?LET(N, integer(), N*2 + 1).
+
 
 
 %%%%%%%%%%%%%%%%%%
 %%% Generators %%%
 %%%%%%%%%%%%%%%%%%
 
+even() -> ?LET(N, integer(), N*2).
+uneven() -> ?LET(N, integer(), N*2 + 1).

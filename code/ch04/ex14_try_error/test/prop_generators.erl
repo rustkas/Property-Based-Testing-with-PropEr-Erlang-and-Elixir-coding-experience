@@ -25,12 +25,13 @@ prop_list_content_integer() ->
 %%%%%%%%%%%%%%%
 %%% Helpers %%%
 %%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%
+%%% Generators %%%
+%%%%%%%%%%%%%%%%%%
 check_length(Gen) ->
     ?SUCHTHAT(L, Gen, length(L) > 10).
 
 check_list_content_integer(Gen) ->
     ?SUCHTHAT(L, Gen, lists:any(fun(Elem) -> is_integer(Elem) end, L)).
-
-%%%%%%%%%%%%%%%%%%
-%%% Generators %%%
-%%%%%%%%%%%%%%%%%%

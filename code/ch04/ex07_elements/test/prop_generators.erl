@@ -25,9 +25,6 @@ prop_dupes() ->
 %%%%%%%%%%%%%%%
 %%% Helpers %%%
 %%%%%%%%%%%%%%%
-key() -> elements([range(1,10), integer()]).
-
-val() -> term().
 
 to_range(M, N) ->
     Base = N div M,
@@ -38,3 +35,6 @@ to_range(M, N) ->
 %%%%%%%%%%%%%%%%%%
 %%% Generators %%%
 %%%%%%%%%%%%%%%%%%
+key() -> elements([range(1,10), integer()]).
+
+val() -> term().

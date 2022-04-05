@@ -18,31 +18,40 @@ prop_non_empty3()->
  		lists:all(fun(Elem)-> is_integer(Elem) orelse is_bitstring(Elem) end, List)).
 
 prop_non_empty_map()->
-?FORALL(List, non_empty(list(map(non_neg_integer(),float()))), 
+?FORALL(List, list(non_empty_map(map(non_neg_integer(),float()))), 
  		lists:all(fun(Elem)-> is_map(Elem) end, List)).
 
 prop_non_empty_list()->
-?FORALL(List, non_empty(list(non_neg_integer())), 
+?FORALL(List, non_empty_list(list(non_neg_integer())), 
  		lists:all(fun(Elem)-> is_integer(Elem) end, List)).
 
 prop_non_empty_string()->
-?FORALL(List, non_empty(list(string())), 
+?FORALL(List, list(non_empty_string(string())), 
  		lists:all(fun(Elem)-> is_list(Elem) end, List)).
 		
-prop_non_bitstring()->
-?FORALL(List, non_empty(list(bitstring(64))), 
+prop_non_empty_bitstring()->
+?FORALL(List, list(non_empty_bitstring(bitstring(64))), 
  		lists:all(fun(Elem)-> is_bitstring(Elem) end, List)).		
 
-prop_non_tuple1()->
-?FORALL(List, non_empty(list(tuple())), 
+prop_non_empty_tuple1()->
+?FORALL(List, list(non_empty_tuple(tuple())), 
  		lists:all(fun(Elem)-> is_tuple(Elem) end, List)).				
 
-prop_non_tuple2()->
-?FORALL(List, non_empty(list(tuple([integer(), string()]))), 
- 		lists:all(fun(Elem)-> is_tuple(Elem) end, List)).						
-		
+prop_non_empty_tuple2()->
+?FORALL(List, list(non_empty_tuple(tuple([integer(), string()]))), 
+ 		lists:all(fun(Elem)-> is_tuple(Elem) end, List)).
+
+prop_even()->
+?FORALL(List, list(even()), 
+ 		lists:all(fun(Elem)-> Elem rem 2 =:= 0 end, List)).
+
+prop_uneven()->
+?FORALL(List, list(uneven()), 
+			lists:all(fun(Elem)-> Elem rem 2 =/= 0 end, List)).
+			
+
 %%%%%%%%%%%%%%%
-%%% Helpers %%%
+%%% Generators %%%
 %%%%%%%%%%%%%%%
 non_empty1(ListOrBinGenerator) ->
          ?SUCHTHAT(L, ListOrBinGenerator, L =/= [] andalso L =/= <<>>).
@@ -61,3 +70,6 @@ non_empty_bitstring(Gen) ->
 
 non_empty_tuple(Gen) ->
      ?SUCHTHAT(T, Gen, T =/= {}).
+
+even() ->   ?SUCHTHAT(N, integer(), N rem 2 =:= 0).
+uneven() -> ?SUCHTHAT(N, integer(), N rem 2 =/= 0).

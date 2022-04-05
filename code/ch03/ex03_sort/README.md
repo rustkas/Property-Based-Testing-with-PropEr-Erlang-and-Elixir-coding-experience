@@ -24,6 +24,7 @@ Create new propety via PropEr
 	$ rebar3 proper -p prop_biggest
 	$ rebar3 proper -p prop_last
 	$ rebar3 proper -p prop_sort
+    $ rebar3 proper -p prop_keysort1
 	$ rebar3 proper -n 10000000
 	$ rebar3 eunit
 

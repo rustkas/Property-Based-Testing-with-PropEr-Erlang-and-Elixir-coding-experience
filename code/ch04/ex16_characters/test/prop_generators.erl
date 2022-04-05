@@ -18,7 +18,7 @@ prop_latin1_string2() ->
 prop_unicode_string() ->
     ?FORALL(String, unicode_string(),
 			begin
-            io:format("~ts~n",[String]),
+            %io:format("~ts~n",[String]),
 			is_list(String)
 			end
         ).
@@ -26,7 +26,7 @@ prop_unicode_string() ->
 prop_unicode_string2() ->
     ?FORALL(String, unicode_string2(),
 			begin
-            io:format("~ts~n",[String]),
+            %io:format("~ts~n",[String]),
 			is_bitstring(String)
 			end
         ).		
@@ -34,18 +34,11 @@ prop_unicode_string2() ->
 prop_unicode_string3() ->
     ?FORALL(String, unicode_string3(),
 			begin
-            io:format("~ts~n",[String]),
+            %io:format("~ts~n",[String]),
 			is_list(String)
 			end
         ).		
 
-prop_unicode_string4() ->
-    ?FORALL(String, unicode_string4(),
-			begin
-            io:format("~ts~n",[String]),
-			is_list(String)
-			end
-        ).
 		
 %%%%%%%%%%%%%%%
 %%% Helpers %%%

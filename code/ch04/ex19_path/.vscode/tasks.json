@@ -1,0 +1,17 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "prop_path -n 5",
+            "type": "shell",
+            "command": "rebar3 proper -p prop_path -n 5"
+        },
+        {
+            "label": "proper",
+            "type": "shell",
+            "command": "rebar3 proper"
+        }
+    ]
+}

@@ -19,10 +19,11 @@ prop_dupes() ->
 %%%%%%%%%%%%%%%
 %%% Helpers %%%
 %%%%%%%%%%%%%%%
-key() -> integer().
 
-val() -> term().
 
 %%%%%%%%%%%%%%%%%%
 %%% Generators %%%
 %%%%%%%%%%%%%%%%%%
+key() -> integer().
+
+val() -> term().

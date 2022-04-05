@@ -12,7 +12,7 @@ prop_dict_gen() ->
                 %io:format("~p~n",[D]),
                 Result = dict:size(D) < 5,
                 if Result ->
-                       io:format("~p~n", [D]),
+                       %io:format("~p~n", [D]),
                        true;
                    true ->
                        true
@@ -26,7 +26,7 @@ prop_dict_symb() ->
                 %io:format("~p~n", [DSymb]),
                 Result = dict:size(eval(DSymb)) < 5,
                 if Result ->
-                       io:format("~p~n", [DSymb]),
+                       %io:format("~p~n", [DSymb]),
                        true;
                    true ->
                        false
@@ -40,7 +40,7 @@ prop_dict_autosymb() ->
                 %io:format("~p~n", [D]),
                 Result = dict:size(D) < 5,
                 if Result ->
-                       io:format("~p~n", [D]),
+                       %io:format("~p~n", [D]),
                        true;
                    true ->
                        false

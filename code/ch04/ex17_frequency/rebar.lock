@@ -1,1 +1,4 @@
-[].
+[{<<"sstr">>,
+  {git,"https://github.com/rustkas/erlang-simple-string.git",
+       {ref,"f4a0b1cace9cfcf47e9abf9b1e73772d447b51e4"}},
+  0}].

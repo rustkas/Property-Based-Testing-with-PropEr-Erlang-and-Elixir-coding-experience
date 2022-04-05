@@ -1,6 +1,6 @@
--sname ex01_bday
+-sname ex02_bday
 
--setcookie ex01_bday_cookie
+-setcookie ex02_bday_cookie
 
 +K true
 +A30

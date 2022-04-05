@@ -31,10 +31,11 @@ path() ->
 path(_Current, Acc, _Seen, [_,_,_,_]) -> % all directions tried
     Acc; % we give up
 path(Current, Acc, Seen, Ignore) ->
+    non_empty(
     frequency([
 	    {1, Acc}, % probabilistic stop
 	    {15, increase_path(Current, Acc, Seen, Ignore)}
-	]).
+	])).
 
 increase_path(Current, Acc, Seen, Ignore) ->
     DirectionGen = oneof([left, right, up, down] -- Ignore),

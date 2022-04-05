@@ -7,7 +7,7 @@
 %%%%%%%%%%%%%%%%%%
 prop_resize() ->
     ?FORALL(Bin,
-            resize(150, binary()), % <= resized here
+            resize(250, binary()), % <= resized here
             collect(to_range(10, byte_size(Bin)), is_binary(Bin))).
 
 %%%%%%%%%%%%%%%

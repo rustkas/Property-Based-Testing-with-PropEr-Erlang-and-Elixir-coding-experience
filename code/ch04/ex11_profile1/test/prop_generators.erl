@@ -33,7 +33,7 @@ prop_profile3() ->
                    {age, pos_integer()},
                    {bio, ?SIZED(Size,resize(min(100,Size)*35,string()))}],
       begin
-          NameLen = to_range(10,length(proplists:get_value(name, Profile))),
+          _NameLen = to_range(10,length(proplists:get_value(name, Profile))),
           BioLen = to_range(300,length(proplists:get_value(bio, Profile))),
           aggregate([
 		  %{name, NameLen}, 
