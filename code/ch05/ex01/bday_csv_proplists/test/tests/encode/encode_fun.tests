@@ -1,0 +1,32 @@
+encode_01_emulation_test() ->
+    Expected = "aaa,bbb,ccc\r\nzzz,yyy,xxx\r\nzzz,yyy,xxx",
+	DeepTupleList = 
+		[[{"aaa", "zzz"}, {"bbb", "yyy"}, {"ccc", "xxx"}],
+         [{"aaa", "zzz"}, {"bbb", "yyy"}, {"ccc", "xxx"}]],
+	
+	Regex = "(?<=\")[0-9a-zA-Z:;<=>?@ !#$%&'\"()*+-./[\\]^_`{|}~]*(?=\")",
+    {ok, MP} = re:compile(Regex),
+
+	
+	Keys = get_csv_keys(DeepTupleList,MP),
+    Values = get_csv_values(DeepTupleList,MP),
+    Result = lists:flatten([Keys, "\r\n", Values]),
+	%?debugFmt("~n~p~n",[Result]),
+    ?assertEqual(Expected, Result).
+	
+encode_01_test() ->
+	Expected = "aaa,bbb,ccc\r\nzzz,yyy,xxx\r\nzzz,yyy,xxx",
+    DeepTupleList = 
+		[[{"aaa", "zzz"}, {"bbb", "yyy"}, {"ccc", "xxx"}],
+         [{"aaa", "zzz"}, {"bbb", "yyy"}, {"ccc", "xxx"}]],
+	
+	
+    Result = encode(DeepTupleList),
+    ?assertEqual(Expected, Result).
+	
+
+	
+	
+	
+	
+	

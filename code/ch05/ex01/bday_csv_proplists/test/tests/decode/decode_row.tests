@@ -1,0 +1,116 @@
+decode_row_emulate_01_test() ->
+    Expected = {["aaa", "bbb"], ""},
+    InputString = "aaa,bbb",
+    DecodeRow_2 =
+        fun Decode_row(String, Acc) ->
+                case decode_field(String) of
+                    {go_on, Field, Rest} ->
+                        Decode_row(Rest, Acc ++ [Field]);
+                    {done, Field, Rest} ->
+                        Result = Acc ++ [Field],
+                        {Result, Rest}
+                end
+        end,
+    DecodeRow_1 =
+        fun (String) ->
+                DecodeRow_2(String, [])
+        end,
+    Result = DecodeRow_1(InputString),
+    ?assertEqual(Expected, Result).
+
+decode_row_01_test() ->
+    Expected = {["abc", "dfg"], ""},
+    String = "abc,dfg",
+    Result = decode_row(String),
+    ?assertEqual(Expected, Result).
+
+decode_row_02_test() ->
+    
+    String1 = "\",\"",     				% ,
+	String2 = "\"\r\n\"",  				% \r\n
+	String3 = string:trim("\" \"\" \""),% ""
+	String4 = "\" \"",   				% 
+	Expected = {[String1, String2, string:trim("\" \" \""), String4], ""},
+	String = String1 ++ "," ++ String2 ++ "," ++ String3 ++ "," ++ String4,
+    Result = decode_row(String),
+    ?assertEqual(Expected, Result).
+
+
+decode_row_03_test() ->
+    Expected = {["abc", "dfg"], "abc,dfg"},
+    String = "abc,dfg\r\nabc,dfg",
+    Result = decode_row(String),
+    ?assertEqual(Expected, Result).
+
+% @doc	
+% ```
+% aaa,bbb,ccc CRLF
+% zzz,yyy,xxx CRLF
+% ```
+decode_row_04_01_test() ->
+	String1 = "aaa,bbb,ccc",
+	String2 = "zzz,yyy,xxx",
+	Expected = {string:split(String1, ",", all), String2 ++ "\r\n"},
+	String = String1 ++ "\r\n" ++ String2 ++ "\r\n",
+	Result = decode_row(String),
+	?assertEqual(Expected, Result).
+	
+% @doc	
+% ```
+% aaa,bbb,ccc CRLF
+% zzz,yyy,xxx
+% ```
+decode_row_04_02_test() ->
+	String1 = "aaa,bbb,ccc",
+	String2 = "zzz,yyy,xxx",
+	Expected = {string:split(String1, ",", all), String2},
+	String = String1 ++ "\r\n" ++ String2,
+	Result = decode_row(String),
+	?assertEqual(Expected, Result).	
+	
+% @doc	
+% ```
+% field_name,field_name,field_name CRLF
+% aaa,bbb,ccc CRLF
+% zzz,yyy,xxx CRLF
+% ```
+decode_row_05_test() ->
+	String1 = "field_name,field_name,field_name",
+	String2 = "aaa,bbb,ccc",
+	String3 = "zzz,yyy,xxx",
+	Expected = {string:split(String1, ",", all), String2 ++ "\r\n" ++ String3},
+	String = String1 ++ "\r\n" ++ String2 ++ "\r\n" ++ String3,
+	Result = decode_row(String),
+	?assertEqual(Expected, Result).		
+	
+% @doc	
+% ```
+% "aaa","bbb","ccc" CRLF
+% zzz,yyy,xxx
+% ```
+decode_row_06_test() ->
+	String1 = "field_name,field_name,field_name",
+	String2 = "aaa,bbb,ccc",
+	String3 = "zzz,yyy,xxx",
+	Expected = {string:split(String1, ",", all), String2 ++ "\r\n" ++ String3},
+	String = String1 ++ "\r\n" ++ String2 ++ "\r\n" ++ String3,
+	Result = decode_row(String),
+	?assertEqual(Expected, Result).	
+	
+% @doc	
+% ```
+% "aaa","b CRLF
+% bb","ccc" CRLF
+% zzz,yyy,xxx
+% ```
+decode_row_07_test() ->
+	
+	String1_01 = "\"aaa\"",
+	String1_02 = "\"b\r\nbb\"",
+	String1_03 = "\"ccc\"",
+	String2 = "zzz,yyy,xxx",
+	Expected = {[String1_01,String1_02,String1_03], String2},
+	
+	String = String1_01 ++ "," ++ String1_02 ++ "," ++ String1_03 ++ "\r\n" ++ String2,
+	Result = decode_row(String),
+	?assertEqual(Expected, Result).		

@@ -1,7 +1,0 @@
--include("decode_unquoted.tests").
--include("decode_quoted.tests").
--include("decode_field.tests").
--include("decode_row.tests").
--include("decode_rows.tests").
--include("decode_header.tests").
--include("decode_fun.tests").

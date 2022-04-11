@@ -1,0 +1,27 @@
+decode_field_01_01_test() ->
+    Expected = {done, "", ""},
+    String = "",
+    Result = decode_field(String),
+    ?assertEqual(Expected, Result).
+	
+decode_field_01_02_test() ->
+    Expected = {go_on, [], []},
+    String = ",",
+    Result = decode_field(String),
+    ?assertEqual(Expected, Result).	
+	
+% Fields containing line breaks (CRLF)
+decode_field_02_01_test() ->
+    Expected = {done, "\"\r\n\"", ""},
+    String = "\"\r\n\"",
+	Result = decode_field(String),
+	%?debugFmt("Result = ~p~n", [Result]),
+    ?assertEqual(Expected, Result).	
+	
+% Fields containing line breaks (CRLF)
+decode_field_02_02_test() ->
+    Expected = {go_on, "\"\r\n\"", "\"\r\n\""},
+    String = "\"\r\n\",\"\r\n\"",
+	Result = decode_field(String),
+	%?debugFmt("Result = ~p~n", [Result]),
+    ?assertEqual(Expected, Result).	

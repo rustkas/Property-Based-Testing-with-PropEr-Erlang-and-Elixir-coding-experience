@@ -1,0 +1,10 @@
+decode_header_01_test() ->
+    String1 = "aaa",
+	String2 = "bbb",
+	String3 = "ccc",
+	String = String1 ++ "," ++ String2 ++ "," ++ String3 ++ "\r\n",
+	NumberOfCopies = rand:uniform(10),
+	LongString = string:copies(String,NumberOfCopies),
+    {Header, _Rest} = decode_header(LongString),
+	Expected = [String1, String2, String3],
+    ?assertEqual(Expected, Header).

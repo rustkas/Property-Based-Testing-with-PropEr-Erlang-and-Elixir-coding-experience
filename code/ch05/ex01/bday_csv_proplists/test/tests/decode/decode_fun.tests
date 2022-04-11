@@ -1,0 +1,65 @@
+decode_01_emulate_test() ->
+    Expected = [{"aaa", "zzz"}, {"bbb", "yyy"}, {"ccc", "xxx"}],
+    String = "aaa,bbb,ccc\r\nzzz,yyy,xxx",
+    {Header, Rest} = decode_header(String),
+    Rows = decode_rows(Rest),
+    ZipList = lists:zip(Header, Rows),
+	%?debugFmt("~n~p~n", [ZipLists]).
+    ?assertEqual(Expected, ZipList).
+	
+decode_02_emulate_test() ->
+    Expected = [
+		[{"aaa", "zzz"}, {"bbb", "yyy"}, {"ccc", "xxx"}],
+		[{"aaa", "111"}, {"bbb", "222"}, {"ccc", "333"}]
+	]	,
+    String = "aaa,bbb,ccc\r\nzzz,yyy,xxx\r\n111,222,333",
+    {Header, Rest} = decode_header(String),
+    Rows = decode_rows(Rest),
+	ZipList = [lists:zip(Header, Row) || Row <- Rows],
+    %?debugFmt("~n~p~n", [ZipList]).
+    ?assertEqual(Expected, ZipList).	
+	
+	
+decode_03_emulate_test() ->
+    Expected = [[{"aaa", "zzz"}, {"bbb", "yyy"}, {"ccc", "xxx"}]],
+    String = "aaa,bbb,ccc\r\nzzz,yyy,xxx",
+    {Header, Rest} = decode_header(String),
+    HeadherLength = length(Header),
+	Rows = decode_rows(Rest, true),
+    %?debugFmt("~n~p~n", [Rows]).
+	ZipList = [lists:zip(Header, Row) || Row <- Rows, HeadherLength == length(Row)],
+	%?debugFmt("~n~p~n", [ZipList]).
+    ?assertEqual(Expected, ZipList).
+	
+decode_04_emulate_test() ->
+    Expected = [],
+    String = "aaa,bbb,ccc\r\n",
+    {Header, _Rest} = decode_header(String),
+    HeadherLength = length(Header),
+	%Rows = decode_rows(Rest, true),
+    Rows = [],
+	%?debugFmt("~n~p~n", [Rows]).
+	ZipList = [lists:zip(Header, Row) || Row <- Rows, HeadherLength == length(Row)],
+	%?debugFmt("~n~p~n", [ZipList]).
+    ?assertEqual(Expected, ZipList).
+	
+decode_01_test() ->
+	Title1 = "header1",
+	Title2 = "header2",
+	Title3 = "header3",
+	Title = Title1 ++ "," ++ Title2 ++ "," ++ Title3 ++ "\r\n",
+	TitleList = [Title1, Title2, Title3],
+	
+	Value1 = "value1",
+	Value2 = "value2",
+	Value3 = "value3",
+	DataString = Value1 ++ "," ++ Value2 ++ "," ++ Value3 ++ "\r\n",
+	NumberOfCopies = rand:uniform(10),
+	LongString = Title ++ string:copies(DataString, NumberOfCopies),
+	
+	Result = decode(LongString),
+	
+	Lists = lists:duplicate(NumberOfCopies, [Value1, Value2, Value3]),
+	Expected = [lists:zip(TitleList, List) || List <- Lists],
+	?assertEqual(Expected, Result).
+	

@@ -1,0 +1,88 @@
+
+decode_rows_01_emulate_test() ->
+    Expected = [["aaa", "bbb", "ccc"],["111", "222", "333"]],
+    StringInput = "aaa,bbb,ccc\r\n111,222,333",
+    Decode_rowsFun =
+        fun Decode_rows(String, HasMore) ->
+                case decode_row(String) of
+					{Row, ""} ->
+						%?debugFmt("Function Result = ~p~n", [Row]),
+						if HasMore == true ->
+							[Row];
+						HasMore == false ->
+							Row
+						end;
+					{Row, Rest} ->
+						%?debugFmt("Current Value = ~p~n", [Row]),
+						[Row | Decode_rows(Rest, true)]
+                end
+        end,
+    Result = Decode_rowsFun(StringInput, false),
+    ?assertEqual(Expected, Result).
+	
+decode_rows_02_emulate_test() ->
+    Expected = ["aaa", "bbb", "ccc"],
+    StringInput = "aaa,bbb,ccc",
+    Decode_rowsFun =
+        fun Decode_rows(String, HasMore) ->
+                case decode_row(String) of
+					{Row, ""} ->
+						%?debugFmt("~nFunction Result = ~p~n", [Row]),
+						if HasMore == true ->
+							[Row];
+						HasMore == false ->
+							Row
+						end;
+					{Row, Rest} ->
+						%?debugFmt("~nCurrent Value = ~p~n", [Row]),
+						[Row | Decode_rows(Rest, true)]
+                end
+        end,
+    Result = Decode_rowsFun(StringInput, false),
+    ?assertEqual(Expected, Result).	
+	
+decode_rows_01_test() ->
+    Expected = ["aaa", "bbb", "ccc"],
+    String = "aaa,bbb,ccc",
+    Result = decode_rows(String),
+    ?assertEqual(Expected, Result).	
+	
+decode_rows_02_test() ->
+    String = "aaa,bbb,ccc\r\nzzz,yyy,xxx",
+    Result = decode_rows(String),
+    Expected = [["aaa", "bbb", "ccc"], ["zzz", "yyy", "xxx"]],
+    ?assertEqual(Expected, Result).	
+	
+decode_rows_04_test() ->
+    String1 = "\"aaa\"",
+	String2 = "\"\r\n\"",
+	String3 = "\"\"\"\"",
+	String = String1 ++ "," ++ String2 ++ "," ++ String3 ++ "\r\nzzz,yyy,xxx",
+    Result = decode_rows(String),
+    Expected = [[String1, String2, "\"\"\""], ["zzz", "yyy", "xxx"]],
+    ?assertEqual(Expected, Result).	
+	
+decode_rows_05_test() ->
+    String1 = "aaa",
+	String2 = "bbb",
+	String3 = "ccc",
+	String = String1 ++ "," ++ String2 ++ "," ++ String3 ++ "\r\n",
+	NumberOfCopies = rand:uniform(10),
+	LongString = string:copies(String,NumberOfCopies),
+    Result = decode_rows(LongString),
+    Expected = lists:duplicate(NumberOfCopies, [String1, String2, String3]),
+    ?assertEqual(Expected, Result).
+	
+decode_rows_06_test() ->
+    String1 = "",
+	String2 = "",
+	String3 = "",
+	String = String1 ++ "," ++ String2 ++ "," ++ String3 ++ "\r\n",
+	NumberOfCopies = rand:uniform(10),
+	LongString = string:copies(String,NumberOfCopies),
+    Result = decode_rows(LongString),
+    Expected = lists:duplicate(NumberOfCopies, [String1, String2, String3]),
+    ?assertEqual(Expected, Result).	
+	
+
+

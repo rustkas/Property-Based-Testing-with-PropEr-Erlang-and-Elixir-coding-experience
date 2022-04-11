@@ -1,9 +1,0 @@
-%-include("decode_tune_string.tests").
-%-include("decode_split_test.tests").
-%-include("decode_remove_useless_double_quote.tests").
-%-include("decode_get_header.tests").
-%-include("decode_get_data.tests").
-%-include("decode_csv.tests").
-%-include("decode_build_split_rows.tests").
-%-include("decode_shrink.tests").
-%-include("decode_split_row.tests").

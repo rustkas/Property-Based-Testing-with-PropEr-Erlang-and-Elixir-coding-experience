@@ -1,0 +1,121 @@
+
+% Fields containing line breaks (CRLF)
+decode_quoted_01_01_test() ->
+    Expected = {done, "\"\r\n\"", ""},
+    String = "\"\r\n\"",
+    %?debugFmt("String = ~p~n", [String]),
+	Result = decode_quoted(String),
+	%?debugFmt("Result = ~p~n", [Result]),
+    ?assertEqual(Expected, Result).
+	
+% Fields containing line breaks (CRLF)
+decode_quoted_01_02_test() ->
+    Expected = {done, "\"\r\n\r\n\"", ""},
+    String = "\"\r\n\r\n\"",
+    %?debugFmt("String = ~p~n", [String]),
+	Result = decode_quoted(String),
+	%?debugFmt("Result = ~p~n", [Result]),
+    ?assertEqual(Expected, Result).	
+	
+% Fields containing double quotes	
+decode_quoted_02_01_test() ->
+    Expected = {done, "\"\"\"", ""},
+    String = "\"\"\"\"",
+    %?debugFmt("String = ~p~n", [String]),
+	Result = decode_quoted(String),
+	%?debugFmt("Result = ~p~n", [Result]),
+    ?assertEqual(Expected, Result).	
+	
+% Fields containing double quotes	
+decode_quoted_02_02_test() ->
+    Expected = {done, "\"\"\"\"", ""},
+    String = "\"\"\"\"\"\"",
+    %?debugFmt("String = ~p~n", [String]),
+	Result = decode_quoted(String),
+	%?debugFmt("Result = ~p~n", [Result]),
+    ?assertEqual(Expected, Result).		
+	
+% Fields containing commas	
+decode_quoted_03_01_test() ->
+    Expected = {done, "\",\"", ""},
+    String = "\",\"",
+    %?debugFmt("String = ~p~n", [String]),
+	Result = decode_quoted(String),
+	%?debugFmt("Result = ~p~n", [Result]),
+    ?assertEqual(Expected, Result).
+
+% Fields containing commas	
+decode_quoted_03_02_test() ->
+    Expected = {done, "\",,\"", ""},
+    String = "\",,\"",
+    %?debugFmt("String = ~p~n", [String]),
+	Result = decode_quoted(String),
+	%?debugFmt("Result = ~p~n", [Result]),
+    ?assertEqual(Expected, Result).
+
+% Fields containing line breaks (CRLF)
+decode_quoted_04_01_test() ->
+    Expected = {go_on, "\"\r\n\"", "\"\r\n\""},
+    String = "\"\r\n\",\"\r\n\"",
+    %?debugFmt("String = ~p~n", [String]),
+	Result = decode_quoted(String),
+	%?debugFmt("Result = ~p~n", [Result]),
+    ?assertEqual(Expected, Result).
+	
+% Fields containing line breaks (CRLF)
+decode_quoted_04_02_test() ->
+    Expected = {go_on, "\"\r\n\r\n\"", "\"\r\n\r\n\""},
+    String = "\"\r\n\r\n\",\"\r\n\r\n\"",
+    %?debugFmt("String = ~p~n", [String]),
+	Result = decode_quoted(String),
+	%?debugFmt("Result = ~p~n", [Result]),
+    ?assertEqual(Expected, Result).	
+	
+% Fields containing double quotes	
+decode_quoted_05_01_test() ->
+    Expected = {go_on, "\"\"\"", "\"\"\"\""},
+    String = "\"\"\"\",\"\"\"\"",
+    %?debugFmt("String = ~p~n", [String]),
+	Result = decode_quoted(String),
+	%?debugFmt("Result = ~p~n", [Result]),
+    ?assertEqual(Expected, Result).	
+	
+% Fields containing double quotes	
+decode_quoted_05_02_test() ->
+    Expected = {go_on, "\"\"\"\"", "\"\"\"\"\"\""},
+    String = "\"\"\"\"\"\",\"\"\"\"\"\"",
+    %?debugFmt("String = ~p~n", [String]),
+	Result = decode_quoted(String),
+	%?debugFmt("Result = ~p~n", [Result]),
+    ?assertEqual(Expected, Result).		
+
+% Fields containing commas	
+decode_quoted_06_01_test() ->
+    Expected = {go_on, "\",\"","\",\""},
+    String =           "\",\",\",\"",
+    %?debugFmt("String = ~p~n", [String]),
+	Result = decode_quoted(String),
+	%?debugFmt("Result = ~p~n", [Result]),
+    ?assertEqual(Expected, Result).
+
+% Fields containing commas	
+decode_quoted_06_02_test() ->
+    Expected = {go_on, "\",,\"", "\",,\""},
+    String = "\",,\",\",,\"",
+    %?debugFmt("String = ~p~n", [String]),
+	Result = decode_quoted(String),
+	%?debugFmt("Result = ~p~n", [Result]),
+    ?assertEqual(Expected, Result).	
+
+
+decode_quoted_07_test() ->
+                   
+    Expected = {done, "\"\"\rA\"", []},
+    String =           "\"\"\rA\"",
+    %?debugFmt("String = ~p~n", [String]),
+	Result = decode_quoted(String),
+	%?debugFmt("Result = ~p~n", [Result]),
+    ?assertEqual(Expected, Result).	
+
+
+	

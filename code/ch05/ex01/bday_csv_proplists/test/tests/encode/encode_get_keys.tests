@@ -1,0 +1,80 @@
+get_keys_01_emulation_test() ->
+    Expected = "aaa,bbb,ccc",
+    DeepTupleList =
+        [[{"aaa", "zzz"}, {"bbb", "yyy"}, {"ccc", "xxx"}],
+         [{"aaa", "zzz"}, {"bbb", "yyy"}, {"ccc", "xxx"}]],
+
+	Regex = "(?<=\")[0-9a-zA-Z:;<=>?@ !#$%&'\"()*+-./[\\]^_`{|}~]*(?=\")",
+    {ok, MP} = re:compile(Regex),
+	
+	put("EncodeSanitizeMP", MP),
+	MP = get("EncodeSanitizeMP"),
+	
+	FirstList = hd(DeepTupleList),
+    Keys =
+        lists:map(fun(Elem) ->
+                     Key = element(1, Elem),
+                     EscapedKey = sanitize(Key, MP),
+                     EscapedKey
+                  end,
+                  FirstList),
+    JoinedList = lists:join(",", Keys),
+    KeysString = lists:flatten(JoinedList),
+    
+	?assertEqual(["aaa", "bbb", "ccc"], Keys),
+    ?assertEqual(Expected, KeysString).
+	
+get_keys_02_test() ->
+    Expected = "aaa,bbb,ccc",
+    DeepTupleList =
+        [[{"aaa", "zzz"}, {"bbb", "yyy"}, {"ccc", "xxx"}],
+         [{"aaa", "zzz"}, {"bbb", "yyy"}, {"ccc", "xxx"}]],
+
+	Regex = "(?<=\")[0-9a-zA-Z:;<=>?@ !#$%&'\"()*+-./[\\]^_`{|}~]*(?=\")",
+    {ok, MP} = re:compile(Regex),
+	
+
+    KeysString = get_csv_keys(DeepTupleList,MP),
+
+    ?assertEqual(Expected, KeysString).	
+	
+
+get_keys_03_test() ->
+    Expected = "B,A",
+    DeepTupleList = [[{"B", []}, {"A", []}]],
+	
+	Regex = "(?<=\")[0-9a-zA-Z:;<=>?@ !#$%&'\"()*+-./[\\]^_`{|}~]*(?=\")",
+    {ok, MP} = re:compile(Regex),
+	
+    KeysString = get_csv_keys(DeepTupleList,MP),
+    ?assertEqual(Expected, KeysString).
+	
+get_keys_04_test() ->
+    Expected = "A,0",
+    DeepTupleList = [[{"A", "v"}, {"0", "^"}]],
+
+	Regex = "(?<=\")[0-9a-zA-Z:;<=>?@ !#$%&'\"()*+-./[\\]^_`{|}~]*(?=\")",
+    {ok, MP} = re:compile(Regex),
+	
+	KeysString = get_csv_keys(DeepTupleList,MP),
+    ?assertEqual(Expected, KeysString).
+	
+get_keys_05_test() ->
+    Expected = "A,C",
+    DeepTupleList = [[{"A", []}, {"C", "N"}]],
+	
+	Regex = "(?<=\")[0-9a-zA-Z:;<=>?@ !#$%&'\"()*+-./[\\]^_`{|}~]*(?=\")",
+    {ok, MP} = re:compile(Regex),
+	
+    KeysString = get_csv_keys(DeepTupleList,MP),
+    ?assertEqual(Expected, KeysString).
+	
+get_keys_06_test() ->
+    Expected = "A,C",
+    DeepTupleList = [[{[65], []}, {[67], []}]],
+	
+	Regex = "(?<=\")[0-9a-zA-Z:;<=>?@ !#$%&'\"()*+-./[\\]^_`{|}~]*(?=\")",
+    {ok, MP} = re:compile(Regex),
+	
+    KeysString = get_csv_keys(DeepTupleList,MP),
+    ?assertEqual(Expected, KeysString).

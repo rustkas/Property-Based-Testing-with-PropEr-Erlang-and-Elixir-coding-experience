@@ -1,0 +1,72 @@
+
+	
+	
+sanitize_01_emulate_test() ->
+	InputValue = "\"test\"",
+	
+	Regex = "(?<=\")[0-9a-zA-Z:;<=>?@ !#$%&'\"\r\n()*+-./[\\]^_`{|}~]*(?=\")",
+    {ok, MP} = re:compile(Regex),
+	RegexResult = re:run(InputValue, MP, [{capture, all, list}]),
+	case RegexResult of
+		nomatch ->
+			InputValue = InputValue;
+			%?debugFmt("~nnomatch. ~p~n", [InputValue]);
+		{match, [Captured]} ->
+			Captured = Captured
+			%?debugFmt("~nCaptured = ~p~n", [Captured])
+	end.
+	
+sanitize_02_emulate_test() ->
+	InputValue = "\"\"\"",
+	
+	Regex = "(?<=\")[0-9a-zA-Z:;<=>?@ !#$%&'\"\r\n()*+-./[\\]^_`{|}~]*(?=\")",
+    {ok, MP} = re:compile(Regex),
+	RegexResult = re:run(InputValue, MP, [{capture, all, list}]),
+	Result = case RegexResult of
+		nomatch ->
+			%?debugFmt("~nnomatch. ~p~n", [InputValue]),
+			InputValue;
+		{match, [Captured]} ->
+			%?debugFmt("~nCaptured = ~p~n", [Captured]),
+			SearchPattern = "\"",
+			SanitizedString = string:replace(Captured, SearchPattern, "\"\"", all),
+			%?debugFmt("~nSanitizedString1 = ~tp~n", [SanitizedString]),
+			NewList = [$"] ++ unicode:characters_to_list(SanitizedString) ++ [$"],
+			%?debugFmt("~nNewList = ~p~n", [NewList]),
+			NewList
+	end,
+	%?debugFmt("~nResult = ~p~n", [Result]),
+	Result.
+    
+	
+sanitize_01_test() ->
+	Expected   = "\"\"\"\"",
+	InputValue = "\"\"\"",
+	
+	Regex = "(?<=\")[0-9a-zA-Z:;<=>?@ !#$%&'\"\r\n()*+-./[\\]^_`{|}~]*(?=\")",
+    {ok, MP} = re:compile(Regex),
+	Result = sanitize(InputValue, MP),
+	?assertEqual(Expected, Result).
+	
+sanitize_02_test() ->
+	Expected   = "aaa",
+	InputValue = "aaa",
+	
+	Regex = "(?<=\")[0-9a-zA-Z:;<=>?@ !#$%&'\"\r\n()*+-./[\\]^_`{|}~]*(?=\")",
+    {ok, MP} = re:compile(Regex),
+	Result = sanitize(InputValue, MP),
+	?assertEqual(Expected, Result).
+	
+sanitize_03_test() ->
+	Expected   = "\"aaa\"",
+	InputValue = "\"aaa\"",
+	
+	Regex = "(?<=\")[0-9a-zA-Z:;<=>?@ !#$%&'\"\r\n()*+-./[\\]^_`{|}~]*(?=\")",
+    {ok, MP} = re:compile(Regex),
+	Result = sanitize(InputValue, MP),
+	?assertEqual(Expected, Result).
+	
+
+
+	
+	

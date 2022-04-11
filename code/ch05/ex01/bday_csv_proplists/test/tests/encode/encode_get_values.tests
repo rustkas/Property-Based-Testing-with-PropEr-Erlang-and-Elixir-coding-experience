@@ -1,0 +1,49 @@
+get_values_01_emulation_test() ->
+    Expected = "zzz,yyy,xxx\r\nzzz,yyy,xxx",
+    DeepTupleList =
+        [[{"aaa", "zzz"}, {"bbb", "yyy"}, {"ccc", "xxx"}],
+         [{"aaa", "zzz"}, {"bbb", "yyy"}, {"ccc", "xxx"}]],
+
+    Regex = "(?<=\")[0-9a-zA-Z:;<=>?@ !#$%&'\"()*+-./[\\]^_`{|}~]*(?=\")",
+    {ok, MP} = re:compile(Regex),
+	
+	ListLists =
+        [lists:map(fun(Elem) ->
+                      Value = element(2, Elem),
+                      EscapedValue = sanitize(Value, MP),
+                      EscapedValue
+                   end,
+                   TupleList)
+         || TupleList <- DeepTupleList],
+    ValuesLists = [lists:join(",", List) || List <- ListLists],
+    JoinedList = lists:join("\r\n", ValuesLists),
+    ValuesString = lists:flatten(JoinedList),
+	
+	?assertEqual(Expected, ValuesString).
+	
+get_values_01_test() ->
+    Expected = "zzz,yyy,xxx\r\nzzz,yyy,xxx",
+    DeepTupleList =
+        [[{"aaa", "zzz"}, {"bbb", "yyy"}, {"ccc", "xxx"}],
+         [{"aaa", "zzz"}, {"bbb", "yyy"}, {"ccc", "xxx"}]],
+
+	Regex = "(?<=\")[0-9a-zA-Z:;<=>?@ !#$%&'\"()*+-./[\\]^_`{|}~]*(?=\")",
+    {ok, MP} = re:compile(Regex),
+	
+    ValuesString = get_csv_values(DeepTupleList,MP),
+    ?assertEqual(Expected, ValuesString).	
+	
+get_values_02_test() ->
+    Expected = ",AA,\"A\n\"\r\nA,AAA,\"\"",
+    DeepTupleList=
+	[
+		[{"\"\"\"",[]}, {"AA","AA"}, {"\"\n\r\"","\"A\n\""}],
+        [{"\"\"\"","A"},{"AA","AAA"},{"\"\n\r\"","\"\"\rA\""}]
+	],
+	%?debugFmt("~nDeepTupleList=~p~n", [DeepTupleList]),
+	Regex = "(?<=\")[0-9a-zA-Z:;<=>?@ !#$%&'\"()*+-./[\\]^_`{|}~]*(?=\")",
+    {ok, MP} = re:compile(Regex),
+	
+    ValuesString = get_csv_values(DeepTupleList,MP),
+	%?debugFmt("~nValuesString:~p~n", [ValuesString]).
+    ?assertEqual(Expected, ValuesString).	

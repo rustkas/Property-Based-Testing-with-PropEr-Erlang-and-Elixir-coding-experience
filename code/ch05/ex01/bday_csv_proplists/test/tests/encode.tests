@@ -1,0 +1,4 @@
+-include("encode/encode_sanitize.tests").
+-include("encode/encode_get_keys.tests").
+-include("encode/encode_get_values.tests").
+-include("encode/encode_fun.tests").
